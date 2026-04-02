@@ -1,0 +1,89 @@
+# UltraBoost — Instruction Maître pour Cursor
+# Ce fichier est lu automatiquement par Cursor à chaque prompt.
+
+## IDENTITÉ
+UltraBoost est une plateforme PREMIUM pour professionnels de haut niveau (36 ans et plus).
+Public : CEO, DG, Directeurs, Managers, Entrepreneurs confirmés.
+Basé à Abidjan, Côte d'Ivoire. Monnaie : FCFA (XOF).
+
+## STACK TECHNIQUE
+- Next.js 14+ (App Router, TypeScript, src/ directory)
+- Tailwind CSS
+- Xano (backend no-code, API REST, base URL dans NEXT_PUBLIC_XANO_API_URL)
+- Paystack (paiements FCFA, Mobile Money, Orange Money)
+- Zustand (state management)
+- Framer Motion (animations)
+- react-hook-form + zod (formulaires)
+- Axios (appels API via src/lib/api.ts)
+
+## DESIGN SYSTEM "EXECUTIVE DARK"
+Chaque composant DOIT respecter ces règles :
+
+### Couleurs (variables CSS obligatoires)
+--color-bg-primary: #0A0A0F         (fond principal, noir profond)
+--color-bg-secondary: #12121A       (fond sections alternées)
+--color-bg-card: #1A1A25            (fond cartes)
+--color-bg-glass: rgba(26,26,37,0.6) (fond glassmorphism)
+--color-gold: #C9A84C               (or principal — boutons, accents)
+--color-gold-light: #E4C972         (or hover)
+--color-gold-dark: #A68A3A          (or sombre)
+--color-text-primary: #F5F5F7       (texte principal)
+--color-text-secondary: #9999A9     (sous-titres)
+--color-text-muted: #666677         (placeholders)
+
+### Glassmorphism (OBLIGATOIRE sur toutes les cartes)
+.glass-card-gold {
+  background: rgba(26, 26, 37, 0.6);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(201, 168, 76, 0.10);
+  border-radius: 16px;
+}
+.glass-card-gold:hover {
+  border-color: rgba(201, 168, 76, 0.25);
+  box-shadow: 0 0 30px rgba(201, 168, 76, 0.06);
+}
+
+### Bordures dorées
+- Défaut : 1px solid rgba(201, 168, 76, 0.10) — subtile, 10% opacité
+- Hover : rgba(201, 168, 76, 0.25)
+- Active : rgba(201, 168, 76, 0.40)
+- JAMAIS de bordure blanche ou grise sur les cartes premium
+
+### Typographie
+- Titres : 'Playfair Display', serif (importé via next/font/google)
+- Corps : 'DM Sans', sans-serif (importé via next/font/google)
+- JAMAIS Arial, Inter, Roboto, ou system fonts
+
+### Boutons
+- Principal : gradient doré (--color-gold → --color-gold-dark), texte noir
+- Secondaire : transparent, bordure dorée, texte doré
+- Hover : translateY(-1px) + box-shadow doré
+
+### Animations
+- Framer Motion pour les entrées de page et les transitions
+- Transitions CSS : 0.3s ease sur hover
+- Hover cartes : translateY(-2px)
+
+## ARCHITECTURE (séparation stricte)
+### Vitrine publique (pas d'auth requise)
+- / (home), /ultrabootcamps, /hub, /travelbootcamps, /agenda, /about, /contact
+- /auth/login, /auth/signup, /auth/pending
+
+### Dashboard privé (JWT + is_verified = true)
+- /dashboard, /dashboard/profile, /dashboard/bootcamps
+- /dashboard/hub, /dashboard/payments, /dashboard/events, /dashboard/certificates
+
+### Admin (JWT + role = admin)
+- /admin, /admin/users, /admin/admissions, /admin/payments, /admin/events
+
+## RÈGLES DE CODE
+1. Tous les appels API passent par src/lib/api.ts (Axios + JWT interceptor)
+2. Les formulaires utilisent react-hook-form + zod
+3. Les montants sont en FCFA : amount.toLocaleString('fr-FR') + ' FCFA'
+4. Les pop-ups utilisent un composant Modal glassmorphism (ne quittent jamais la page)
+5. Les cartes utilisent TOUJOURS glass-card-gold
+6. Les inputs utilisent la classe glass-input (fond semi-transparent, bordure fine)
+7. Les images de bootcamps affichent un badge de niveau (Ecosystem → Executive)
+8. Responsive : mobile-first, le site doit être parfait sur téléphone
+9. Toutes les coordonnées : Abidjan — Côte d'Ivoire, +225 05 01 19 55 55, infos@ultraboost.pro
