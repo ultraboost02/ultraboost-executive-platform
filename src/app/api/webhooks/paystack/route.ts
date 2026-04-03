@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+﻿/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { sendEmail, isEmailConfigured } from "@/lib/email";
 import {
@@ -56,13 +56,9 @@ export async function POST(req: NextRequest) {
   const amountKobo = Number(data.amount ?? 0);
   const amountFcfa = Math.round(amountKobo / 100);
 
-  const commissionExists = await hasExistingCommission({
-    admissionId,
-    reference,
-  });
+  const commissionExists = await hasExistingCommission({ admissionId, reference });
 
-  const admissionUpdatePath =
-    env("XANO_ADMISSION_UPDATE_PATH") || "/admissions/{id}";
+  const admissionUpdatePath = env("XANO_ADMISSION_UPDATE_PATH") || "/admissions/{id}";
   if (admissionId != null) {
     await xanoServerFetch(
       interpolatePath(admissionUpdatePath, { id: admissionId }),
@@ -107,7 +103,7 @@ export async function POST(req: NextRequest) {
         base_amount_fcfa: amountFcfa,
         rate: 0.1,
         status: "en_attente",
-        label: "Commission de départ (10%)",
+        label: "Commission de depart (10%)",
         paystack_reference: reference || null,
         created_at: new Date().toISOString(),
       }),
@@ -117,12 +113,11 @@ export async function POST(req: NextRequest) {
   if (email && isEmailConfigured()) {
     const subject = "Bienvenue sur UltraBoost Executive";
     const text =
-      `Bienvenue ${firstName || ""}.\n\n` +
-      `Votre paiement a été confirmé.\n` +
-      `Vos accès seront activés sous 48 heures.\n\n` +
-      `Connexion membre : https://ultraboost.pro/membre/login\n` +
-      `Lien de parrainage : ${lien}\n`;
-
+      "Bienvenue " + (firstName || "") + ".\n\n" +
+      "Votre paiement a ete confirme.\n" +
+      "Vos acces seront actives sous 48 heures.\n\n" +
+      "Connexion membre : https://ultraboost.pro/membre/login\n" +
+      "Lien de parrainage : " + lien + "\n";
     try {
       await sendEmail({ to: email, subject, text });
     } catch {}
@@ -133,8 +128,8 @@ export async function POST(req: NextRequest) {
     try {
       await sendEmail({
         to: parrainEmail,
-        subject: "Votre filleul vient de s'inscrire",
-        text: `Votre filleul ${firstName || "—"} vient de s'inscrire.`,
+        subject: "Votre filleul vient de s inscrire",
+        text: "Votre filleul " + (firstName || "-") + " vient de s inscrire.",
       });
     } catch {}
   }
@@ -154,9 +149,7 @@ async function getOrCreateUserReferralLink(userId: unknown): Promise<string> {
   if (!res.ok) return fallback;
 
   try {
-    const user = JSON.parse(res.text) as {
-      lien_parrainage_unique?: unknown;
-    };
+    const user = JSON.parse(res.text) as { lien_parrainage_unique?: unknown };
     const existing = String(user?.lien_parrainage_unique ?? "").trim();
     return existing || fallback;
   } catch {
@@ -174,22 +167,17 @@ async function hasExistingCommission({
   const base = env("XANO_COMMISSION_CREATE_PATH") || "/commissions";
 
   const queries: string[] = [];
-  if (reference) {
-    queries.push(`paystack_reference=${encodeURIComponent(reference)}`);
-  }
-  if (admissionId != null) {
-    queries.push(`admission_id=${encodeURIComponent(String(admissionId))}`);
-  }
+  if (reference) queries.push("paystack_reference=" + encodeURIComponent(reference));
+  if (admissionId != null) queries.push("admission_id=" + encodeURIComponent(String(admissionId)));
   if (queries.length === 0) return false;
 
-  const path = `${base}?${queries.join("&")}`;
+  const path = base + "?" + queries.join("&");
   const res = await xanoServerFetch(path, { method: "GET" });
   if (!res.ok) return false;
 
   try {
     const parsed = JSON.parse(res.text) as unknown;
     if (Array.isArray(parsed)) return parsed.length > 0;
-
     const obj = parsed as { id?: unknown };
     return Boolean(obj?.id);
   } catch {
