@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { sendEmail, isEmailConfigured } from "@/lib/email";
 import {
@@ -47,8 +48,7 @@ export async function POST(req: NextRequest) {
 
   const admissionId = md.admission_id ?? md.admissionId ?? md.admission;
   const userId = md.user_id ?? md.userId ?? md.user;
-  const parrainId =
-    md.parrain_id ?? md.sponsor_id ?? md.referrer_id ?? null;
+  const parrainId = md.parrain_id ?? md.sponsor_id ?? md.referrer_id ?? null;
   const firstName = String(md.first_name ?? md.firstname ?? "").trim();
   const email = String(md.email ?? data.customer?.email ?? "").trim();
   const reference = String(data.reference ?? "").trim();
