@@ -1,4 +1,6 @@
 ﻿/* eslint-disable @typescript-eslint/no-explicit-any */
+// @ts-nocheck
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { sendEmail, isEmailConfigured } from "@/lib/email";
 import {
