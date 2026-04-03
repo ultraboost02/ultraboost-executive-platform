@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendEmail, isEmailConfigured } from "@/lib/email";
-import { interpolatePath, verifyPaystackSignature, xanoServerFetch } from "@/lib/xano/server-client";
+import {
+  interpolatePath,
+  verifyPaystackSignature,
+  xanoServerFetch,
+} from "@/lib/xano/server-client";
 
 function env(name: string): string {
   return process.env[name]?.trim() ?? "";
@@ -43,7 +47,8 @@ export async function POST(req: NextRequest) {
 
   const admissionId = md.admission_id ?? md.admissionId ?? md.admission;
   const userId = md.user_id ?? md.userId ?? md.user;
-  const parrainId = md.parrain_id ?? md.sponsor_id ?? md.referrer_id ?? null;
+  const parrainId =
+    md.parrain_id ?? md.sponsor_id ?? md.referrer_id ?? null;
   const firstName = String(md.first_name ?? md.firstname ?? "").trim();
   const email = String(md.email ?? data.customer?.email ?? "").trim();
   const reference = String(data.reference ?? "").trim();
@@ -51,19 +56,28 @@ export async function POST(req: NextRequest) {
   const amountKobo = Number(data.amount ?? 0);
   const amountFcfa = Math.round(amountKobo / 100);
 
-  const commissionExists = await hasExistingCommission({ admissionId, reference });
+  const commissionExists = await hasExistingCommission({
+    admissionId,
+    reference,
+  });
 
-  // 1) admission -> payé
-  const admissionUpdatePath = env("XANO_ADMISSION_UPDATE_PATH") || "/admissions/{id}";
+  const admissionUpdatePath =
+    env("XANO_ADMISSION_UPDATE_PATH") || "/admissions/{id}";
   if (admissionId != null) {
-    await xanoServerFetch(interpolatePath(admissionUpdatePath, { id: admissionId }), {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "paye", paystack_reference: reference || null, paid_at: data.paid_at ?? null }),
-    });
+    await xanoServerFetch(
+      interpolatePath(admissionUpdatePath, { id: admissionId }),
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status: "paye",
+          paystack_reference: reference || null,
+          paid_at: data.paid_at ?? null,
+        }),
+      }
+    );
   }
 
-  // 2) user -> actif + lien parrainage unique
   const userUpdatePath = env("XANO_USER_UPDATE_PATH") || "/users/{id}";
   const lien = await getOrCreateUserReferralLink(userId);
   if (userId != null) {
@@ -79,7 +93,6 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // 3) commission 10% en attente
   const commissionPath = env("XANO_COMMISSION_CREATE_PATH") || "/commissions";
   const commissionAmount = Math.round(amountFcfa * 0.1);
   if (parrainId != null && commissionAmount > 0 && !commissionExists) {
@@ -101,7 +114,6 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // 4) email bienvenue
   if (email && isEmailConfigured()) {
     const subject = "Bienvenue sur UltraBoost Executive";
     const text =
@@ -116,7 +128,6 @@ export async function POST(req: NextRequest) {
     } catch {}
   }
 
-  // 5) email parrain
   const parrainEmail = String(md.parrain_email ?? "").trim();
   if (parrainEmail && isEmailConfigured()) {
     try {
@@ -136,11 +147,16 @@ async function getOrCreateUserReferralLink(userId: unknown): Promise<string> {
   if (userId == null) return fallback;
 
   const getPath = env("XANO_USER_GET_PATH") || "/users/{id}";
-  const res = await xanoServerFetch(interpolatePath(getPath, { id: String(userId) }), { method: "GET" });
+  const res = await xanoServerFetch(
+    interpolatePath(getPath, { id: String(userId) }),
+    { method: "GET" }
+  );
   if (!res.ok) return fallback;
 
   try {
-    const user = JSON.parse(res.text) as { lien_parrainage_unique?: unknown };
+    const user = JSON.parse(res.text) as {
+      lien_parrainage_unique?: unknown;
+    };
     const existing = String(user?.lien_parrainage_unique ?? "").trim();
     return existing || fallback;
   } catch {
@@ -158,8 +174,12 @@ async function hasExistingCommission({
   const base = env("XANO_COMMISSION_CREATE_PATH") || "/commissions";
 
   const queries: string[] = [];
-  if (reference) queries.push(`paystack_reference=${encodeURIComponent(reference)}`);
-  if (admissionId != null) queries.push(`admission_id=${encodeURIComponent(String(admissionId))}`);
+  if (reference) {
+    queries.push(`paystack_reference=${encodeURIComponent(reference)}`);
+  }
+  if (admissionId != null) {
+    queries.push(`admission_id=${encodeURIComponent(String(admissionId))}`);
+  }
   if (queries.length === 0) return false;
 
   const path = `${base}?${queries.join("&")}`;
@@ -182,6 +202,8 @@ function createReferralCode(): string {
   const bytes = new Uint8Array(8);
   crypto.getRandomValues(bytes);
   let out = "UB-";
-  for (const b of bytes) out += alphabet[b % alphabet.length];
+  for (const b of bytes) {
+    out += alphabet[b % alphabet.length];
+  }
   return out;
 }
