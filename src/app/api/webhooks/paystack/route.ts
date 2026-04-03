@@ -11,7 +11,7 @@ type PaystackEvent = {
   data?: {
     amount?: number;
     customer?: { email?: string };
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
     reference?: string;
     paid_at?: string;
     status?: string;
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
   }
 
   const data = event.data ?? {};
-  const md = (data.metadata ?? {}) as Record<string, any>;
+  const md = (data.metadata ?? {}) as Record<string, unknown>;
 
   const admissionId = md.admission_id ?? md.admissionId ?? md.admission;
   const userId = md.user_id ?? md.userId ?? md.user;
@@ -174,11 +174,12 @@ async function hasExistingCommission({
   try {
     const parsed = JSON.parse(res.text) as unknown;
     if (Array.isArray(parsed)) return parsed.length > 0;
-    return Boolean((parsed as any)?.id);
+  
+    const obj = parsed as { id?: unknown };
+    return Boolean(obj?.id);
   } catch {
     return false;
   }
-}
 
 function createReferralCode(): string {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

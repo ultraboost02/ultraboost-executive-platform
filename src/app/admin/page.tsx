@@ -5,6 +5,32 @@ import { SiteFooter } from "@/components/layout/SiteFooter";
 import { requireAdminTokenOrRedirect } from "@/lib/admin/server-session";
 import { fetchAdminAdmissions, fetchAdminMe, fetchAdminMembres, fetchAdminRetraits } from "@/lib/xano/admin-api";
 
+type AdmissionItem = {
+  id?: unknown;
+  first_name?: unknown;
+  last_name?: unknown;
+  email?: unknown;
+  status?: unknown;
+};
+
+type RetraitItem = {
+  id?: unknown;
+  amount_fcfa?: unknown;
+  payment_method?: unknown;
+  status?: unknown;
+};
+
+type MembreItem = {
+  id?: unknown;
+  first_name?: unknown;
+  last_name?: unknown;
+  email?: unknown;
+  statut?: unknown;
+  status?: unknown;
+  rang_label?: unknown;
+  rank_label?: unknown;
+};
+
 function isAllowedRole(role: unknown): boolean {
   const r = String(role ?? "").toLowerCase();
   return r === "super_admin" || r === "admin";
@@ -63,7 +89,7 @@ export default async function AdminPage() {
               <p className="mt-4 text-sm text-[#9999A9]">Aucune admission.</p>
             ) : (
               <ul className="mt-4 space-y-3 text-sm">
-                {admissions.data.slice(0, 10).map((a: any) => (
+                {admissions.data.slice(0, 10).map((a: AdmissionItem) => (
                   <li key={String(a.id)} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
                     <p className="text-[#F5F5F7]">
                       {a.first_name || "—"} {a.last_name || ""} <span className="text-[#9999A9]">· {a.email || "—"}</span>
@@ -103,7 +129,7 @@ export default async function AdminPage() {
               <p className="mt-4 text-sm text-[#9999A9]">Aucun retrait.</p>
             ) : (
               <ul className="mt-4 space-y-3 text-sm">
-                {retraits.data.slice(0, 10).map((r: any) => (
+              {retraits.data.slice(0, 10).map((r: RetraitItem) => (
                   <li key={String(r.id)} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
                     <p className="text-[#F5F5F7]">
                       {String(r.amount_fcfa ?? "—")} FCFA <span className="text-[#9999A9]">· {String(r.payment_method ?? "—")}</span>
@@ -131,7 +157,7 @@ export default async function AdminPage() {
               <p className="mt-4 text-sm text-[#9999A9]">Aucun membre.</p>
             ) : (
               <ul className="mt-4 space-y-3 text-sm">
-                {membres.data.slice(0, 12).map((u: any) => (
+                {membres.data.slice(0, 12).map((u: MembreItem) => (
                   <li key={String(u.id)} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
                     <p className="text-[#F5F5F7]">
                       {u.first_name || "—"} {u.last_name || ""} <span className="text-[#9999A9]">· {u.email || "—"}</span>

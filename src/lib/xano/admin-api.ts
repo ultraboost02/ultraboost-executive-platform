@@ -31,7 +31,7 @@ export async function fetchAdminMe(token: string): Promise<{ ok: true; data: Adm
   }
 }
 
-export async function fetchAdminAdmissions(token: string): Promise<{ ok: true; data: any[] } | { ok: false; status: number; message: string }> {
+export async function fetchAdminAdmissions(token: string): Promise<{ ok: true; data: unknown[] } | { ok: false; status: number; message: string }> {
   const path = pathFromEnv("XANO_ADMIN_ADMISSIONS_PATH", "/admin/admissions");
   const res = await adminGet(path, token);
   if (!res.ok) return { ok: false, status: res.status, message: res.text.slice(0, 240) };
@@ -43,7 +43,7 @@ export async function fetchAdminAdmissions(token: string): Promise<{ ok: true; d
   }
 }
 
-export async function fetchAdminRetraits(token: string): Promise<{ ok: true; data: any[] } | { ok: false; status: number; message: string }> {
+export async function fetchAdminRetraits(token: string): Promise<{ ok: true; data: unknown[] } | { ok: false; status: number; message: string }> {
   const path = pathFromEnv("XANO_ADMIN_RETRAITS_PATH", "/admin/retraits");
   const res = await adminGet(path, token);
   if (!res.ok) return { ok: false, status: res.status, message: res.text.slice(0, 240) };
@@ -55,7 +55,7 @@ export async function fetchAdminRetraits(token: string): Promise<{ ok: true; dat
   }
 }
 
-export async function fetchAdminMembres(token: string): Promise<{ ok: true; data: any[] } | { ok: false; status: number; message: string }> {
+export async function fetchAdminMembres(token: string): Promise<{ ok: true; data: unknown[] } | { ok: false; status: number; message: string }> {
   const path = pathFromEnv("XANO_ADMIN_MEMBRES_PATH", "/admin/membres");
   const res = await adminGet(path, token);
   if (!res.ok) return { ok: false, status: res.status, message: res.text.slice(0, 240) };
