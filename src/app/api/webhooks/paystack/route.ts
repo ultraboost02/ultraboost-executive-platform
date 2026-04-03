@@ -73,7 +73,6 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         statut: "actif",
         lien_parrainage_unique: lien,
-        // Valeurs par défaut si Xano ne les calcule pas encore
         rang_label: md.rang_label ?? md.rank_label ?? "silver",
         commission_rate: md.commission_rate ?? 0.1,
       }),
@@ -102,21 +101,19 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // 4) email bienvenue + identifiants (placeholder)
+  // 4) email bienvenue
   if (email && isEmailConfigured()) {
     const subject = "Bienvenue sur UltraBoost Executive";
     const text =
       `Bienvenue ${firstName || ""}.\n\n` +
       `Votre paiement a été confirmé.\n` +
-      `Vos accès seront activés sous 48 heures (si une étape manuelle est requise).\n\n` +
+      `Vos accès seront activés sous 48 heures.\n\n` +
       `Connexion membre : https://ultraboost.pro/membre/login\n` +
       `Lien de parrainage : ${lien}\n`;
 
     try {
       await sendEmail({ to: email, subject, text });
-    } catch {
-      // ignore
-    }
+    } catch {}
   }
 
   // 5) email parrain
@@ -128,9 +125,7 @@ export async function POST(req: NextRequest) {
         subject: "Votre filleul vient de s'inscrire",
         text: `Votre filleul ${firstName || "—"} vient de s'inscrire.`,
       });
-    } catch {
-      // ignore
-    }
+    } catch {}
   }
 
   return NextResponse.json({ ok: true });
@@ -174,12 +169,13 @@ async function hasExistingCommission({
   try {
     const parsed = JSON.parse(res.text) as unknown;
     if (Array.isArray(parsed)) return parsed.length > 0;
-  
+
     const obj = parsed as { id?: unknown };
     return Boolean(obj?.id);
   } catch {
     return false;
   }
+}
 
 function createReferralCode(): string {
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -189,4 +185,3 @@ function createReferralCode(): string {
   for (const b of bytes) out += alphabet[b % alphabet.length];
   return out;
 }
-
