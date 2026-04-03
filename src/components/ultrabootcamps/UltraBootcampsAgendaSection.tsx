@@ -7,7 +7,6 @@ import {
   AGENDA_PUBLIC_STRUCTURE,
   AGENDA_TRACK_META,
   ULTRA_BOOTCAMP_AGENDA_MONTHS,
-  ULTRA_BOOTCAMP_AGENDA_YEAR,
   agendaAccessMode,
   agendaEventFormat,
   agendaThemeLine,
@@ -74,7 +73,7 @@ export function UltraBootcampsAgendaSection({ activeBootcampLevelId }: Props) {
           <div className="glass-card-gold rounded-xl border border-[rgba(201,168,76,0.2)] px-4 py-3 text-right sm:min-w-[220px]">
             <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#9999A9]">Positionnement</p>
             <p className="mt-1 text-sm font-semibold text-[#F5F5F7]">{meta.branding}</p>
-            <p className="mt-2 text-xs text-[#C9A84C]">Calendrier {ULTRA_BOOTCAMP_AGENDA_YEAR} (janv. – nov.)</p>
+            <p className="mt-2 text-xs text-[#C9A84C]">Calendrier janv. – nov.</p>
             <p className="mt-1 text-xs text-[#C8C8CF]">18h00 — 21h00 · 1× / mois</p>
             <p className="mt-2 text-[11px] font-medium text-[#9999A9]">
               {accessMode === "validated" ? "Accès sur validation" : "Accès direct ou semi-ouvert"}

@@ -133,7 +133,8 @@ body {
 .glass-header {
   position: sticky;
   top: 0;
-  z-index: 50;
+  /* Au-dessus du contenu principal et des modales intermédiaires — menu mobile lisible */
+  z-index: 1000;
   background: rgba(10, 10, 15, 0.58);
   border-bottom: 1px solid var(--border-soft);
   backdrop-filter: blur(18px);

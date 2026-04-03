@@ -8,7 +8,7 @@ import { SITE_NAV_LINKS } from "@/components/layout/site-nav";
 const linkClass =
   "whitespace-nowrap text-xs text-[#C8C8CF] transition hover:text-[#C9A84C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A84C]/60 lg:text-sm";
 
-const LOGO_SRC = "/logo.png";
+const LOGO_SRC = "/logo.svg";
 
 export function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -27,17 +27,17 @@ export function SiteHeader() {
   }, [mobileOpen]);
 
   return (
-    <header className="glass-header relative z-20 w-full border-b border-white/[0.06]">
+    <header className="glass-header relative w-full border-b border-white/[0.06]">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-6 py-3 sm:gap-4 sm:px-8 sm:py-4">
         <Link
           href="/"
           className="flex shrink-0 items-center justify-start p-4"
           aria-label="UltraBoost Executive — accueil"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element -- asset statique public/logo.png */}
+          {/* eslint-disable-next-line @next/next/no-img-element -- asset statique public/logo.svg */}
           <img
             src={LOGO_SRC}
-            alt=""
+            alt="UltraBoost"
             width={48}
             height={48}
             className="size-12 shrink-0 object-contain"
@@ -82,7 +82,7 @@ export function SiteHeader() {
       </div>
 
       {mobileOpen && (
-        <div className="fixed inset-0 z-[200] md:hidden">
+        <div className="fixed inset-0 z-[1100] md:hidden">
           <button
             type="button"
             className="absolute inset-0 bg-black/75 backdrop-blur-sm"

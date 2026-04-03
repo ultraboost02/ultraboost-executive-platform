@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 
@@ -219,12 +220,12 @@ const domaines: Record<string, {
         programmes: ["Management de Projet Digital & Stratégie IA", "Management de Projet E-business", "Management de Projets Fintech & InsurTech", "Management de Projet Disruption", "Management Digital Business Marketing & Communication", "Management Développement Technologique & Innovation", "Management Design & Expérience Utilisateur", "Management Digital IA & Conformité", "Management Technologies Sectorielles", "Management FinTech", "Management InsurTech", "Management AgriTech", "Management EdTech", "Management HealthTech", "Management PropTech", "Management GreenTech", "Management LogTech"],
       },
       director: {
-        label: "Director — Executive Diploma (1 285 000 FCFA — 40h)",
+        label: "Director — Executive Diploma (1 850 000 FCFA — 42h)",
         cert: "Executive Diploma",
         programmes: ["Director Digital & Stratégie IA", "Director Data & IA", "Gouvernance Disruption & Stratégie IA", "Director Finance & Assurance", "Pilotage Digital E-Business & Stratégie IA", "Pilotage Sécurité & Conformité", "Pilotage Data & Intelligence Artificielle", "Pilotage Fintech & InsurTech", "Pilotage AgriTech", "Pilotage EdTech", "Pilotage HealthTech", "Pilotage PropTech", "Pilotage GreenTech"],
       },
       executive: {
-        label: "Executive — Global Executive Fellowship (1 850 000 FCFA — 40h)",
+        label: "Executive — Global Executive Fellowship (2 445 000 FCFA — 48h)",
         cert: "Global Executive Fellowship",
         programmes: ["Gouvernance Digitale & Stratégie IA", "Transformation Digitale & Stratégie IA", "Gouvernance Digital Business & Stratégie IA", "Gouvernance des Disruptions & Stratégies IA", "Gouvernance de la Cybersécurité", "Gouvernance du Droit du Digital IA & Éthique", "Gouvernance des Technologies", "Digital Business & Stratégie IA"],
       },
@@ -433,6 +434,14 @@ export default function ContactPage() {
     setLoading(true);
     setError("");
 
+    const formEl = e.currentTarget;
+    const termsAccepted = (formEl.elements.namedItem("terms") as HTMLInputElement | null)?.checked;
+    if (!termsAccepted) {
+      setError("Veuillez accepter les Conditions Générales d'Utilisation pour envoyer votre demande.");
+      setLoading(false);
+      return;
+    }
+
     const dateOfBirth = `${birthYear}-${String(birthMonth).padStart(2, "0")}-${String(birthDay).padStart(2, "0")}`;
 
     const today = new Date();
@@ -442,8 +451,7 @@ export default function ContactPage() {
     if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
     const ageFlag = age < 36 ? "age_below_36" : "";
 
-    const form = e.currentTarget;
-    const formData = new FormData(form);
+    const formData = new FormData(formEl);
 
     const fonction = showAutreFonction
       ? (formData.get("fonction_autre") as string) || ""
@@ -468,27 +476,50 @@ export default function ContactPage() {
       certificate_language: formData.get("langue") || "",
       ultraboost_level: selectedService === "hub" || selectedService === "travel" ? "" : selectedTier,
       hub_delivery_mode: selectedService === "hub" ? hubHubMode : "",
+      message: formData.get("message") || "",
       status: ageFlag ? "flagged_for_review" : "pending",
       terms_accepted: formData.get("terms") === "on",
     };
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_XANO_API_URL;
-      if (!apiUrl) throw new Error("API URL manquante");
+      const xanoPublic = process.env.NEXT_PUBLIC_XANO_API_URL;
+      console.log("[contact/submit] NEXT_PUBLIC_XANO_API_URL =", xanoPublic ?? "(undefined)");
+      console.log("[contact/submit] POST même origine → /admission (proxy serveur, clé API non exposée au navigateur)");
 
-      const res = await fetch(`${apiUrl}/admission`, {
+      const res = await fetch("/admission", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(payload),
       });
 
+      const rawText = await res.text();
+      console.log("[contact/submit] HTTP", res.status, rawText.slice(0, 800));
+
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || "Erreur serveur");
+        let msg = "Erreur serveur";
+        try {
+          const data = rawText ? (JSON.parse(rawText) as unknown) : null;
+          if (data && typeof data === "object" && data !== null) {
+            const d = data as Record<string, unknown>;
+            const fromMessage = typeof d.message === "string" ? d.message : "";
+            const fromError = typeof d.error === "string" ? d.error : "";
+            const fromDetail = typeof d.detail === "string" ? d.detail : "";
+            msg = [fromMessage, fromError, fromDetail].find((s) => s.trim().length > 0) || msg;
+            if (msg === "Erreur serveur" && d.payload != null) {
+              msg = typeof d.payload === "string" ? d.payload : JSON.stringify(d.payload);
+            }
+          }
+        } catch {
+          if (rawText.trim().length > 0 && rawText.length < 500) msg = rawText.trim();
+        }
+        console.error("[contact/submit] échec:", msg);
+        throw new Error(msg);
       }
 
+      console.log("[contact/submit] succès");
+
       setSuccess(true);
-      form.reset();
+      formEl.reset();
       setStep(1);
       setSelectedService("");
       setSelectedDomaine("");
@@ -893,8 +924,21 @@ export default function ContactPage() {
                     <div className="flex items-start gap-3 rounded-xl border border-[rgba(212,175,55,0.12)] bg-white/[0.02] px-4 py-3">
                       <input id="contact-terms" name="terms" required type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 accent-[#D4AF37]" />
                       <label htmlFor="contact-terms" className="text-sm text-[#C8C8CF]">
-                        <span className="block">J&apos;accepte les conditions générales d&apos;UltraBoost</span>
-                        <span className={`${hintCls} mt-2`}>Cochez pour valider l&apos;envoi de votre demande.</span>
+                        <span className="block">
+                          J&apos;accepte les{" "}
+                          <span className="text-[#D4AF37]">Conditions Générales d&apos;Utilisation (CGU)</span>
+                          {" "}d&apos;UltraBoost — obligatoire avant validation.
+                        </span>
+                        <span className="mt-2 block">
+                          <Link
+                            href="/cgu"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[#D4AF37] underline decoration-[rgba(212,175,55,0.45)] underline-offset-4 hover:text-[#E8D5A3]"
+                          >
+                            Lire les conditions
+                          </Link>
+                        </span>
                       </label>
                     </div>
 

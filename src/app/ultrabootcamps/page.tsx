@@ -95,14 +95,14 @@ const CERTIFICATION_COPY: Record<string, { title: string; lines: string[] }> = {
   director: {
     title: "Certifications — Director",
     lines: [
-      "Executive Diploma — 1 285 000 FCFA — 42 h.",
+      "Executive Diploma — 1 850 000 FCFA — 42 h.",
       "Executive Elite Certificate & Executive Fellowship selon filière de pilotage.",
     ],
   },
   executive: {
     title: "Certifications — Executive",
     lines: [
-      "Global Executive Fellowship — 1 850 000 FCFA — 48 h.",
+      "Global Executive Fellowship — 2 445 000 FCFA — 48 h.",
       "Gouvernance, stratégie digitale & conformité : certification d’excellence dirigeants.",
     ],
   },

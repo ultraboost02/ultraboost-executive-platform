@@ -5,6 +5,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { EventAdmissionForm } from "@/components/admission/EventAdmissionForm";
+import type { AgendaTrackKey } from "@/data/ultrabootcamps-agenda";
+import {
+  AGENDA_PUBLIC_STRUCTURE,
+  AGENDA_TRACK_META,
+  ULTRA_BOOTCAMP_AGENDA_MONTHS,
+  agendaAccessMode,
+  agendaDayForTrack,
+  agendaEventFormat,
+  agendaThemeLine,
+} from "@/data/ultrabootcamps-agenda";
 
 type AgendaEvent = {
   month: string;
@@ -14,11 +24,21 @@ type AgendaEvent = {
   type: string;
 };
 
+const TRACK_ORDER: AgendaTrackKey[] = ["general", "specialist", "manager", "director", "executive"];
+
+const TAB_LABEL: Record<AgendaTrackKey, string> = {
+  general: "Agenda General",
+  specialist: "Agenda SPECIALIST",
+  manager: "Agenda MANAGER",
+  director: "Agenda DIRECTOR",
+  executive: "Agenda EXECUTIVE",
+};
+
 const events: AgendaEvent[] = [
   {
     month: "Avril",
-    title: 'Apéro "SIP & MEET"',
-    datetime: "Jeudi 09 Avril 2026 | 18h00 - 21h00",
+    title: 'SIP & MEET Avril — Apéro « SIP & MEET »',
+    datetime: "Jeudi 09 avril 2026 | 18h00 - 21h00",
     description: "Rencontre conviviale entre professionnels du digital et de l'IA.",
     type: "SIP & MEET",
   },
@@ -46,7 +66,7 @@ const events: AgendaEvent[] = [
   },
   {
     month: "Août",
-    title: 'Apéro "SIP & MEET"',
+    title: 'Apéro « SIP & MEET »',
     datetime: "Jeudi 27 août 2026 | 18h00 - 21h00",
     description: "Rencontre conviviale entre professionnels du digital et de l'IA.",
     type: "SIP & MEET",
@@ -82,6 +102,7 @@ const events: AgendaEvent[] = [
 ];
 
 export default function AgendaPage() {
+  const [activeTrack, setActiveTrack] = useState<AgendaTrackKey>("general");
   const [eventModal, setEventModal] = useState<AgendaEvent | null>(null);
 
   useEffect(() => {
@@ -110,7 +131,7 @@ export default function AgendaPage() {
       <AnimatePresence>
         {eventModal && (
           <motion.div
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
+            className="fixed inset-0 z-[1200] flex items-center justify-center p-4 sm:p-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -154,7 +175,7 @@ export default function AgendaPage() {
       </AnimatePresence>
 
       <main className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-16 pt-10 sm:px-8">
-        <motion.section initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
+        <motion.section initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <h1
             className="text-5xl font-semibold leading-[1.05] text-[#D4AF37] md:text-7xl"
             style={{ fontFamily: '"Playfair Display", serif' }}
@@ -162,134 +183,148 @@ export default function AgendaPage() {
             Agenda
           </h1>
           <p className="mt-6 max-w-3xl text-base leading-relaxed text-[#C8C8CF] sm:text-lg">
-            Événements, rencontres et masterclass UltraBoost.
-          </p>
-          <div className="divider-gold mt-8 max-w-2xl" />
-        </motion.section>
-        <motion.section
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-          className="mb-14"
-        >
-          <h1
-            className="text-5xl font-semibold leading-[1.05] text-[#D4AF37] md:text-7xl"
-            style={{ fontFamily: '"Playfair Display", serif' }}
-          >
-            Agenda 2026
-          </h1>
-          <p className="mt-6 max-w-4xl text-base leading-relaxed text-[#C8C8CF] sm:text-lg">
-            Les Jeudis UltraBoost - Événements exclusifs pour notre communauté
+            Événements, rencontres et masterclass UltraBoost — sélectionnez votre filière pour afficher le calendrier dédié.
           </p>
           <div className="divider-gold mt-8 max-w-2xl" />
         </motion.section>
 
-        <section className="relative pl-6 sm:pl-10">
-          <div className="pointer-events-none absolute bottom-0 left-0 top-0 w-px bg-gradient-to-b from-transparent via-[rgba(201,168,76,0.65)] to-transparent sm:left-3" />
-
-          <div className="space-y-8">
-            {events.map((event, index) => (
-              <motion.article
-                key={`${event.month}-${event.title}`}
-                initial={{ opacity: 0, y: 28 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.15 }}
-                transition={{ duration: 0.65, delay: index * 0.02 }}
-                className="relative rounded-2xl border border-[rgba(201,168,76,0.12)] bg-white/[0.02] p-6 pl-8 sm:pl-10"
-              >
-                <div className="absolute left-0 top-8 h-3 w-3 -translate-x-1/2 rounded-full bg-[#D4AF37] shadow-[0_0_0_6px_rgba(212,175,55,0.14)] sm:left-3" />
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="rounded-full border border-[rgba(201,168,76,0.35)] bg-[rgba(201,168,76,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[#D4AF37]">
-                    {event.type}
-                  </span>
-                  <span className="text-sm uppercase tracking-[0.1em] text-[#C8C8CF]">{event.month}</span>
-                </div>
-
-                <h2
-                  className="mt-4 text-2xl font-semibold text-[#D4AF37]"
-                  style={{ fontFamily: '"Playfair Display", serif' }}
-                >
-                  {event.title}
-                </h2>
-
-                <p className="mt-3 text-lg font-medium text-[#F5F5F7]">{event.datetime}</p>
-                <p className="mt-3 text-sm leading-relaxed text-[#C8C8CF]">&quot;{event.description}&quot;</p>
-
+        <div className="sticky top-16 z-[100] -mx-6 mb-10 border-b border-[rgba(201,168,76,0.18)] bg-[#0A0A0F]/92 px-4 py-4 backdrop-blur-md sm:-mx-8 sm:px-6 sm:top-[4.5rem]">
+          <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.28em] text-[#C9A84C]/90">
+            Filières
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+            {TRACK_ORDER.map((key) => {
+              const active = activeTrack === key;
+              return (
                 <button
+                  key={key}
                   type="button"
-                  onClick={() => setEventModal(event)}
-                  className="btn-gold mt-6 px-6 py-3 text-sm"
+                  onClick={() => setActiveTrack(key)}
+                  className={`min-h-[44px] rounded-xl border px-3 py-2.5 text-center text-[10px] font-bold uppercase leading-tight tracking-wide transition sm:min-h-0 sm:px-4 sm:text-xs ${
+                    active
+                      ? "border-[#D4AF37] bg-[rgba(212,175,55,0.14)] text-[#F5F5F7] shadow-[0_0_24px_rgba(212,175,55,0.12)]"
+                      : "border-white/10 bg-white/[0.03] text-[#C8C8CF] hover:border-[rgba(212,175,55,0.35)] hover:text-[#D4AF37]"
+                  }`}
                 >
-                  S&apos;inscrire
+                  {TAB_LABEL[key]}
                 </button>
-              </motion.article>
-            ))}
+              );
+            })}
           </div>
-        </section>
-        <motion.section
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-          className="mb-14"
-        >
-          <h1
-            className="text-5xl font-semibold leading-[1.05] text-[#D4AF37] md:text-7xl"
-            style={{ fontFamily: '"Playfair Display", serif' }}
+        </div>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTrack}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.35 }}
           >
-            Agenda 2026
-          </h1>
-          <p className="mt-6 max-w-4xl text-base leading-relaxed text-[#C8C8CF] sm:text-lg">
-            Les Jeudis UltraBoost - Événements exclusifs pour notre communauté
-          </p>
-          <div className="divider-gold mt-8 max-w-2xl" />
-        </motion.section>
-
-        <section className="relative pl-6 sm:pl-10">
-          <div className="pointer-events-none absolute bottom-0 left-0 top-0 w-px bg-gradient-to-b from-transparent via-[rgba(201,168,76,0.65)] to-transparent sm:left-3" />
-
-          <div className="space-y-8">
-            {events.map((event, index) => (
-              <motion.article
-                key={`${event.month}-${event.title}`}
-                initial={{ opacity: 0, y: 28 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.6, delay: index * 0.04, ease: "easeOut" }}
-                className="relative"
-              >
-                <div className="absolute -left-[29px] top-8 h-3 w-3 rounded-full border border-[rgba(201,168,76,0.5)] bg-[#D4AF37] shadow-[0_0_12px_rgba(212,175,55,0.55)] sm:-left-[31px]" />
-                <div className="glass-card-gold border border-[rgba(201,168,76,0.14)] p-6">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <span className="badge-level" data-level="executive">
-                      {event.type}
-                    </span>
-                    <span className="text-sm uppercase tracking-[0.1em] text-[#C8C8CF]">{event.month}</span>
-                  </div>
-
-                  <h2
-                    className="mt-4 text-2xl font-semibold text-[#D4AF37]"
-                    style={{ fontFamily: '"Playfair Display", serif' }}
-                  >
-                    {event.title}
+            {activeTrack === "general" ? (
+              <section className="relative pl-6 sm:pl-10">
+                <div className="pointer-events-none absolute bottom-0 left-0 top-0 w-px bg-gradient-to-b from-transparent via-[rgba(201,168,76,0.65)] to-transparent sm:left-3" />
+                <div className="mb-8 rounded-2xl border border-[rgba(201,168,76,0.14)] bg-gradient-to-br from-[rgba(212,175,55,0.06)] to-transparent p-6 sm:p-8">
+                  <h2 className="text-xl font-semibold text-[#D4AF37] sm:text-2xl" style={{ fontFamily: '"Playfair Display", serif' }}>
+                    Les Jeudis UltraBoost
                   </h2>
-
-                  <p className="mt-3 text-lg font-medium text-[#F5F5F7]">{event.datetime}</p>
-                  <p className="mt-3 text-sm leading-relaxed text-[#C8C8CF]">&quot;{event.description}&quot;</p>
-
-                  <button
-                    type="button"
-                    onClick={() => setEventModal(event)}
-                    className="btn-gold mt-6 px-6 py-3 text-sm"
-                  >
-                    S&apos;inscrire
-                  </button>
+                  <p className="mt-2 text-sm leading-relaxed text-[#C8C8CF]">
+                    Événements ouverts à la communauté — networking, apéros SIP &amp; MEET, masterclass et rencontres
+                    d&apos;intelligence.
+                  </p>
                 </div>
-              </motion.article>
-            ))}
-          </div>
-        </section>
+                <div className="space-y-8">
+                  {events.map((event, index) => (
+                    <motion.article
+                      key={`${event.month}-${event.title}`}
+                      initial={{ opacity: 0, y: 28 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, amount: 0.15 }}
+                      transition={{ duration: 0.65, delay: index * 0.02 }}
+                      className="relative rounded-2xl border border-[rgba(201,168,76,0.12)] bg-white/[0.02] p-6 pl-8 sm:pl-10"
+                    >
+                      <div className="absolute left-0 top-8 h-3 w-3 -translate-x-1/2 rounded-full bg-[#D4AF37] shadow-[0_0_0_6px_rgba(212,175,55,0.14)] sm:left-3" />
+                      <div className="flex flex-wrap items-center gap-3">
+                        <span className="rounded-full border border-[rgba(201,168,76,0.35)] bg-[rgba(201,168,76,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[#D4AF37]">
+                          {event.type}
+                        </span>
+                        <span className="text-sm uppercase tracking-[0.1em] text-[#C8C8CF]">{event.month}</span>
+                      </div>
+                      <h3
+                        className="mt-4 text-2xl font-semibold text-[#D4AF37]"
+                        style={{ fontFamily: '"Playfair Display", serif' }}
+                      >
+                        {event.title}
+                      </h3>
+                      <p className="mt-3 text-lg font-medium text-[#F5F5F7]">{event.datetime}</p>
+                      <p className="mt-3 text-sm leading-relaxed text-[#C8C8CF]">&quot;{event.description}&quot;</p>
+                      <button
+                        type="button"
+                        onClick={() => setEventModal(event)}
+                        className="btn-gold mt-6 px-6 py-3 text-sm"
+                      >
+                        S&apos;inscrire
+                      </button>
+                    </motion.article>
+                  ))}
+                </div>
+              </section>
+            ) : (
+              <section>
+                {(() => {
+                  const meta = AGENDA_TRACK_META[activeTrack];
+                  const pub = AGENDA_PUBLIC_STRUCTURE[activeTrack];
+                  const access = agendaAccessMode(activeTrack);
+                  return (
+                    <>
+                      <div className="mb-10 rounded-2xl border border-[rgba(201,168,76,0.16)] bg-gradient-to-br from-[rgba(212,175,55,0.08)] via-transparent to-transparent p-6 sm:p-8">
+                        <h2 className="text-2xl font-semibold text-[#D4AF37] sm:text-3xl" style={{ fontFamily: '"Playfair Display", serif' }}>
+                          {meta.label}
+                        </h2>
+                        <p className="mt-2 text-sm font-medium uppercase tracking-[0.15em] text-[#C9A84C]">{meta.branding}</p>
+                        <p className="mt-4 text-sm leading-relaxed text-[#C8C8CF] sm:text-base">{meta.audience}</p>
+                        <p className="mt-4 text-xs text-[#9999A9]">
+                          Rythme indicatif : {pub.dayLabel} — {pub.periodLabel}
+                          {access === "validated" ? (
+                            <span className="ml-2 text-[#D4AF37]">· Accès soumis à validation UltraBoost.</span>
+                          ) : null}
+                        </p>
+                      </div>
+                      <div className="grid gap-6 sm:grid-cols-2">
+                        {ULTRA_BOOTCAMP_AGENDA_MONTHS.map((row, index) => {
+                          const day = agendaDayForTrack(row, activeTrack);
+                          const format = agendaEventFormat(row.monthIndex, activeTrack);
+                          const theme = agendaThemeLine(row.monthIndex, activeTrack);
+                          return (
+                            <motion.article
+                              key={`${activeTrack}-${row.month}`}
+                              initial={{ opacity: 0, y: 20 }}
+                              whileInView={{ opacity: 1, y: 0 }}
+                              viewport={{ once: true, amount: 0.12 }}
+                              transition={{ duration: 0.5, delay: index * 0.02 }}
+                              className="glass-card-gold border border-[rgba(201,168,76,0.14)] p-6"
+                            >
+                              <div className="flex items-center justify-between gap-2 border-b border-white/[0.06] pb-3">
+                                <span className="text-lg font-semibold text-[#D4AF37]" style={{ fontFamily: '"Playfair Display", serif' }}>
+                                  {row.month}
+                                </span>
+                                <span className="rounded-full border border-[rgba(201,168,76,0.3)] bg-[rgba(201,168,76,0.1)] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#C9A84C]">
+                                  Jour {day}
+                                </span>
+                              </div>
+                              <p className="mt-4 text-sm font-semibold text-[#F5F5F7]">{format}</p>
+                              <p className="mt-3 text-sm leading-relaxed text-[#C8C8CF]">{theme}</p>
+                            </motion.article>
+                          );
+                        })}
+                      </div>
+                    </>
+                  );
+                })()}
+              </section>
+            )}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       <SiteFooter />

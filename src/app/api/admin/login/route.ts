@@ -31,9 +31,9 @@ export async function POST(request: Request) {
   });
 
   const text = await res.text();
-  let data: any = {};
+  let data: Record<string, unknown> = {};
   try {
-    data = text ? JSON.parse(text) : {};
+    data = text ? (JSON.parse(text) as Record<string, unknown>) : {};
   } catch {
     // ignore
   }
@@ -62,4 +62,3 @@ export async function POST(request: Request) {
   });
   return resp;
 }
-

@@ -17,8 +17,8 @@ const certificationByLevelId: Record<string, string> = {
   applications: "Certificates of Competence — par logiciel",
   specialist: "Professional Certificate — 545 000 FCFA — 42h",
   manager: "Advanced Certification — 1 345 000 FCFA — 42h",
-  director: "Executive Diploma — 1 285 000 FCFA — 42h",
-  executive: "Global Executive Fellowship — 1 850 000 FCFA — 48h",
+  director: "Executive Diploma — 1 850 000 FCFA — 42h",
+  executive: "Global Executive Fellowship — 2 445 000 FCFA — 48h",
 };
 
 const scheduleSlots = [

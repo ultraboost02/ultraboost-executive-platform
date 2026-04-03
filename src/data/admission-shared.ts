@@ -263,7 +263,7 @@ export const ADMISSION_DOMAINES: AdmissionDomaines = {
         ],
       },
       director: {
-        label: "Director — Executive Diploma (1 285 000 FCFA — 40h)",
+        label: "Director — Executive Diploma (1 850 000 FCFA — 42h)",
         cert: "Executive Diploma",
         programmes: [
           "Director Digital & Stratégie IA",
@@ -282,7 +282,7 @@ export const ADMISSION_DOMAINES: AdmissionDomaines = {
         ],
       },
       executive: {
-        label: "Executive — Global Executive Fellowship (1 850 000 FCFA — 40h)",
+        label: "Executive — Global Executive Fellowship (2 445 000 FCFA — 48h)",
         cert: "Global Executive Fellowship",
         programmes: [
           "Gouvernance Digitale & Stratégie IA",

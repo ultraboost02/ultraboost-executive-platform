@@ -170,15 +170,15 @@ export const ULTRA_BOOTCAMP_SECTIONS: UltraBootcampSection[] = [
     id: "director",
     levelLabel: "DIRECTOR",
     sectionTitle: "Pilotage & Administration",
-    sectionSummary: "1 285 000 FCFA — 42h — 13 bootcamps",
-    items: mapUniform(directorTitles, 42, 1_285_000),
+    sectionSummary: "1 850 000 FCFA — 42h — 13 bootcamps",
+    items: mapUniform(directorTitles, 42, 1_850_000),
   },
   {
     id: "executive",
     levelLabel: "EXECUTIVE",
     sectionTitle: "Gouvernance & Vision",
-    sectionSummary: "1 850 000 FCFA — 48h — 8 bootcamps",
-    items: mapUniform(executiveTitles, 48, 1_850_000),
+    sectionSummary: "2 445 000 FCFA — 48h — 8 bootcamps",
+    items: mapUniform(executiveTitles, 48, 2_445_000),
   },
 ];
 
