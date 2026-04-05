@@ -1,7 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ADMISSION_COUNTRIES, ADMISSION_FONCTIONS } from "@/data/admission-shared";
+import { ADMISSION_FONCTIONS, dialCodeForCountryName, sortedAdmissionCountries } from "@/data/admission-shared";
+import { FormCguAcceptance } from "@/components/forms/FormCguAcceptance";
+import { FormSuccessBlock } from "@/components/forms/FormSuccessBlock";
 import { normalizePhoneLocalDigits, isValidPhoneLocalDigits } from "@/lib/formValidation";
 
 export type NetworkingServiceType = "recrutement_standard" | "matchmaking" | "sur_mesure";
@@ -21,6 +23,8 @@ export function NetworkingDevisForm({ serviceType, onSuccess }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [phoneDialCountry, setPhoneDialCountry] = useState("Côte d'Ivoire");
+  const [whatsappDialCountry, setWhatsappDialCountry] = useState("Côte d'Ivoire");
   const [selectedCountry, setSelectedCountry] = useState("Côte d'Ivoire");
   const [selectedFonction, setSelectedFonction] = useState("");
   const [showAutreFonction, setShowAutreFonction] = useState(false);
@@ -29,16 +33,11 @@ export function NetworkingDevisForm({ serviceType, onSuccess }: Props) {
   const [phoneError, setPhoneError] = useState("");
   const [whatsappError, setWhatsappError] = useState("");
 
-  const phoneCode = useMemo(() => {
-    const c = ADMISSION_COUNTRIES.find((x) => x.name === selectedCountry);
-    if (c?.code) return c.code;
-    return "+225";
-  }, [selectedCountry]);
+  const phoneDialCode = useMemo(() => dialCodeForCountryName(phoneDialCountry), [phoneDialCountry]);
+  const whatsappDialCode = useMemo(() => dialCodeForCountryName(whatsappDialCountry), [whatsappDialCountry]);
 
-  const sortedCountries = useMemo(
-    () => [...ADMISSION_COUNTRIES].sort((a, b) => a.name.localeCompare(b.name, "fr", { sensitivity: "base" })),
-    [],
-  );
+  const sortedCountries = useMemo(() => sortedAdmissionCountries(), []);
+  const sortedDialCountries = sortedCountries;
   const sortedFonctions = useMemo(
     () => [...ADMISSION_FONCTIONS].sort((a, b) => a.localeCompare(b, "fr", { sensitivity: "base" })),
     [],
@@ -54,7 +53,7 @@ export function NetworkingDevisForm({ serviceType, onSuccess }: Props) {
     setLoading(true);
     setError("");
     if (!isValidPhoneLocalDigits(phone)) {
-      setError("Téléphone invalide : vérifiez le numéro (ex. 0710008282).");
+      setError("Téléphone invalide : chiffres uniquement (6 à 15), sans indicatif.");
       setLoading(false);
       return;
     }
@@ -77,8 +76,8 @@ export function NetworkingDevisForm({ serviceType, onSuccess }: Props) {
       first_name: formData.get("first_name") || "",
       last_name: formData.get("last_name") || "",
       email: formData.get("email") || "",
-      phone: `${phoneCode} ${phone || ""}`.trim(),
-      whatsapp: `${phoneCode} ${whatsapp || ""}`.trim(),
+      phone: `${phoneDialCode} ${phone || ""}`.trim(),
+      whatsapp: `${whatsappDialCode} ${whatsapp || ""}`.trim(),
       country: selectedCountry,
       function_title: fonction,
       request_category: formData.get("request_category") || "",
@@ -89,12 +88,9 @@ export function NetworkingDevisForm({ serviceType, onSuccess }: Props) {
     };
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_XANO_API_URL;
-      if (!apiUrl) throw new Error("NEXT_PUBLIC_XANO_API_URL est manquante dans .env.local");
-
-      const res = await fetch(`${apiUrl}/admission`, {
+      const res = await fetch("/admission", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(payload),
       });
 
@@ -123,13 +119,7 @@ export function NetworkingDevisForm({ serviceType, onSuccess }: Props) {
   }
 
   if (success) {
-    return (
-      <div className="rounded-xl border border-green-500/30 bg-green-500/10 p-5 text-center text-sm leading-relaxed text-green-400">
-        <p className="font-medium">Demande envoyée.</p>
-        <p className="mt-2 text-[#C8C8CF]">Merci — notre équipe vous contactera rapidement.</p>
-        <p className="mt-3 text-xs text-[#9999A9]">Ce message reste affiché environ 5 secondes.</p>
-      </div>
-    );
+    return <FormSuccessBlock />;
   }
 
   return (
@@ -167,60 +157,6 @@ export function NetworkingDevisForm({ serviceType, onSuccess }: Props) {
         <input name="email" type="email" required className={inputCls} />
       </label>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <label className="block">
-          <span className={labelCls}>Téléphone ({phoneCode})</span>
-          <span className={hintCls}>Numéro joignable (chiffres après l&apos;indicatif).</span>
-          <div className="flex">
-            <span className="flex items-center rounded-l-lg border border-r-0 border-[rgba(255,255,255,0.08)] bg-[rgba(26,26,37,0.8)] px-3 text-xs text-[#C9A84C]">
-              {phoneCode}
-            </span>
-            <input
-              value={phone}
-              onChange={(e) => {
-                const next = normalizePhoneLocalDigits(e.target.value);
-                setPhone(next);
-                setPhoneError(
-                  next && !isValidPhoneLocalDigits(next)
-                    ? "Numéro invalide (ex. 0710008282 ou +225 collé)."
-                    : "",
-                );
-              }}
-              name="phone"
-              required
-              type="tel"
-              inputMode="numeric"
-              autoComplete="tel-national"
-              className="glass-input w-full rounded-l-none px-4 py-3 text-sm"
-            />
-          </div>
-          {phoneError && <p className="mt-2 text-xs text-red-400">{phoneError}</p>}
-        </label>
-        <label className="block">
-          <span className={labelCls}>WhatsApp ({phoneCode})</span>
-          <span className={hintCls}>Facultatif.</span>
-          <div className="flex">
-            <span className="flex items-center rounded-l-lg border border-r-0 border-[rgba(255,255,255,0.08)] bg-[rgba(26,26,37,0.8)] px-3 text-xs text-[#C9A84C]">
-              {phoneCode}
-            </span>
-            <input
-              value={whatsapp}
-              onChange={(e) => {
-                const next = normalizePhoneLocalDigits(e.target.value);
-                setWhatsapp(next);
-                setWhatsappError(next && !isValidPhoneLocalDigits(next) ? "Numéro invalide." : "");
-              }}
-              name="whatsapp"
-              type="tel"
-              inputMode="numeric"
-              autoComplete="tel-national"
-              className="glass-input w-full rounded-l-none px-4 py-3 text-sm"
-            />
-          </div>
-          {whatsappError && <p className="mt-2 text-xs text-red-400">{whatsappError}</p>}
-        </label>
-      </div>
-
       <label className="block">
         <span className={labelCls}>Pays</span>
         <span className={hintCls}>Pays de résidence ou du siège selon le contexte.</span>
@@ -232,6 +168,80 @@ export function NetworkingDevisForm({ serviceType, onSuccess }: Props) {
           ))}
         </select>
       </label>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="block">
+          <span className={labelCls}>Téléphone</span>
+          <span className={hintCls}>Indicatif pays au choix, puis chiffres uniquement.</span>
+          <div className="mt-2 flex min-w-0">
+            <select
+              value={phoneDialCountry}
+              onChange={(e) => setPhoneDialCountry(e.target.value)}
+              className="glass-input max-w-[min(48%,220px)] shrink-0 rounded-r-none border-r-0 px-2 py-3 text-[11px] sm:text-sm"
+              aria-label="Indicatif téléphone"
+            >
+              {sortedDialCountries.map((c) => (
+                <option key={`tel-${c.name}`} value={c.name}>
+                  {c.flag} {c.code}
+                </option>
+              ))}
+            </select>
+            <input
+              value={phone}
+              onChange={(e) => {
+                const next = normalizePhoneLocalDigits(e.target.value);
+                setPhone(next);
+                setPhoneError(
+                  next && !isValidPhoneLocalDigits(next) ? "Chiffres uniquement (6 à 15), sans indicatif." : "",
+                );
+              }}
+              name="phone"
+              required
+              type="tel"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              autoComplete="tel-national"
+              className="glass-input min-w-0 flex-1 rounded-l-none px-4 py-3 text-sm"
+            />
+          </div>
+          {phoneError && <p className="mt-2 text-xs text-red-400">{phoneError}</p>}
+        </label>
+        <label className="block">
+          <span className={labelCls}>WhatsApp</span>
+          <span className={hintCls}>Facultatif.</span>
+          <div className="mt-2 flex min-w-0">
+            <select
+              value={whatsappDialCountry}
+              onChange={(e) => setWhatsappDialCountry(e.target.value)}
+              className="glass-input max-w-[min(48%,220px)] shrink-0 rounded-r-none border-r-0 px-2 py-3 text-[11px] sm:text-sm"
+              aria-label="Indicatif WhatsApp"
+            >
+              {sortedDialCountries.map((c) => (
+                <option key={`wa-${c.name}`} value={c.name}>
+                  {c.flag} {c.code}
+                </option>
+              ))}
+            </select>
+            <input
+              value={whatsapp}
+              onChange={(e) => {
+                const next = normalizePhoneLocalDigits(e.target.value);
+                setWhatsapp(next);
+                setWhatsappError(
+                  next && !isValidPhoneLocalDigits(next) ? "Chiffres uniquement (6 à 15), sans indicatif." : "",
+                );
+              }}
+              name="whatsapp"
+              type="tel"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              autoComplete="tel-national"
+              className="glass-input min-w-0 flex-1 rounded-l-none px-4 py-3 text-sm"
+            />
+          </div>
+          {whatsappError && <p className="mt-2 text-xs text-red-400">{whatsappError}</p>}
+        </label>
+      </div>
 
       <label className="block">
         <span className={labelCls}>Fonction</span>
@@ -284,13 +294,7 @@ export function NetworkingDevisForm({ serviceType, onSuccess }: Props) {
         <textarea name="description" required rows={4} className="glass-input w-full resize-none px-4 py-3 text-sm" />
       </label>
 
-      <div className="flex items-start gap-3 rounded-xl border border-[rgba(212,175,55,0.12)] bg-white/[0.02] px-4 py-3">
-        <input id="networking-terms" name="terms" required type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 accent-[#D4AF37]" />
-        <label htmlFor="networking-terms" className="text-sm text-[#C8C8CF]">
-          <span className="block">J&apos;accepte les conditions générales d&apos;UltraBoost</span>
-          <span className={`${hintCls} mt-2`}>Cochez cette case pour valider l&apos;envoi.</span>
-        </label>
-      </div>
+      <FormCguAcceptance id="networking-terms" />
 
       {error && <p className="text-sm text-red-400">{error}</p>}
 

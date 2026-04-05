@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
   const listRes = await xanoServerFetch(listPath, { method: "GET" });
   if (!listRes.ok) return NextResponse.json({ error: "Xano list failed", detail: listRes.text.slice(0, 500) }, { status: 502 });
 
-  let rows: any[] = [];
+  let rows: unknown[] = [];
   try {
     const raw = listRes.text ? JSON.parse(listRes.text) : [];
     rows = Array.isArray(raw) ? raw : (raw?.items ?? raw?.data ?? []);
@@ -36,12 +36,14 @@ export async function GET(req: NextRequest) {
   }
 
   const updated: Array<string | number> = [];
-  for (const r of rows) {
+  for (const row of rows) {
+    const r = row as Record<string, unknown>;
     const created = String(r.created_at ?? r.createdAt ?? "");
     const ageDays = daysSince(created);
     if (ageDays == null || ageDays <= 10) continue;
-    const id = r.id;
-    if (id == null) continue;
+    const rawId = r.id;
+    if (rawId == null || (typeof rawId !== "string" && typeof rawId !== "number")) continue;
+    const id = rawId;
     const path = interpolatePath(updateTpl, { id });
     const upd = await xanoServerFetch(path, {
       method: "PATCH",
@@ -53,4 +55,3 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({ ok: true, scanned: rows.length, updated_count: updated.length, updated });
 }
-

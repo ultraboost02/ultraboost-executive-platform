@@ -6,7 +6,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { UltraBootcampsStickyNav } from "@/components/ultrabootcamps/UltraBootcampsStickyNav";
-import { UltraBootcampsAgendaSection } from "@/components/ultrabootcamps/UltraBootcampsAgendaSection";
 import { BootcampProgramDetailModal } from "@/components/ultrabootcamps/BootcampProgramDetailModal";
 import { AdmissionFormWizard } from "@/components/admission/AdmissionFormWizard";
 import { ULTRA_BOOTCAMP_SECTIONS, ULTRA_BOOTCAMP_FORMATS } from "@/data/ultrabootcamps";
@@ -632,7 +631,6 @@ export default function UltraBootcampsPage() {
             </p>
           </motion.section>
 
-          <UltraBootcampsAgendaSection activeBootcampLevelId={activeSection} />
         </div>
       </main>
 

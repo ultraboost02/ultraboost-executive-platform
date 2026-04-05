@@ -1,8 +1,11 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { MembreFetchError } from "@/components/membre/MembreFetchError";
 import { MembreStubBanner } from "@/components/membre/MembreStubBanner";
 import { isMembreStubToken, requireMembreTokenOrRedirect } from "@/lib/membre/server-session";
+import { communityAgendaTrackFromProfile } from "@/lib/membre-community";
 import { formatFCFA } from "@/lib/utils";
+import { AGENDA_TRACK_META } from "@/data/ultrabootcamps-agenda";
 import { fetchMembreDashboard } from "@/lib/xano/membre-api";
 
 function commissionTierFromRank(rankLabel: string | null | undefined): { tier: string; ratePct: number } | null {
@@ -43,6 +46,23 @@ export default async function MembreDashboardPage() {
               </div>
             ))}
           </div>
+
+          <div className="mt-10 rounded-2xl border border-[rgba(201,168,76,0.14)] bg-gradient-to-br from-[rgba(212,175,55,0.06)] to-transparent p-6 sm:p-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#C9A84C]/90">UltraBoost Community</p>
+            <h2 className="mt-2 text-lg font-semibold text-[#F5F5F7]" style={{ fontFamily: '"Playfair Display", serif' }}>
+              Votre communauté &amp; agenda
+            </h2>
+            <p className="mt-2 text-sm text-[#9999A9]">
+              Une fois Xano connecté, votre niveau de bootcamp détermine automatiquement le calendrier et les accès
+              communautaires affichés ici.
+            </p>
+            <Link
+              href="/agenda"
+              className="btn-outline-gold mt-5 inline-flex px-6 py-2.5 text-xs font-semibold uppercase tracking-wider"
+            >
+              Voir les agendas
+            </Link>
+          </div>
         </div>
       </>
     );
@@ -55,6 +75,8 @@ export default async function MembreDashboardPage() {
   }
 
   const d = res.data;
+  const communityTrack = communityAgendaTrackFromProfile(d.bootcamp_track);
+  const communityMeta = AGENDA_TRACK_META[communityTrack];
   const tier = commissionTierFromRank(d.rank_label);
   const cards = [
     { label: "Solde disponible", value: formatFCFA(d.balance_fcfa ?? 0), hint: "balance_fcfa (Xano)" },
@@ -100,6 +122,32 @@ export default async function MembreDashboardPage() {
           ) : (
             <p className="mt-3 text-sm text-[#9999A9]">Aucune URL renvoyée (champ `referral_url` côté Xano).</p>
           )}
+        </div>
+
+        <div className="rounded-2xl border border-[rgba(201,168,76,0.12)] bg-white/[0.02] p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#C9A84C]/90">UltraBoost Community</p>
+          <h2 className="mt-2 text-lg font-semibold text-[#F5F5F7]" style={{ fontFamily: '"Playfair Display", serif' }}>
+            Agenda &amp; réseau selon votre niveau
+          </h2>
+          <p className="mt-2 text-sm text-[#C8C8CF]">
+            Niveau suivi (Xano) :{" "}
+            <span className="font-medium text-[#D4AF37]">{d.bootcamp_track?.trim() || "non renseigné — défaut général"}</span>
+            {d.bootcamp_track?.trim() ? (
+              <>
+                {" "}
+                → calendrier : <span className="text-[#D4AF37]">{communityMeta.label}</span>
+              </>
+            ) : null}
+          </p>
+          <p className="mt-2 text-xs text-[#9999A9]">
+            Événements, rencontres et masterclass : accédez au calendrier correspondant à votre parcours bootcamp.
+          </p>
+          <Link
+            href={`/agenda?track=${communityTrack}`}
+            className="btn-gold mt-5 inline-flex px-6 py-2.5 text-xs font-semibold uppercase tracking-wider"
+          >
+            Ouvrir mon agenda
+          </Link>
         </div>
 
         <div className="rounded-2xl border border-[rgba(201,168,76,0.12)] bg-white/[0.02] p-6">

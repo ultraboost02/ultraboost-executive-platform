@@ -4,6 +4,10 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { FormCguAcceptance } from "@/components/forms/FormCguAcceptance";
+import { FormSuccessBlock } from "@/components/forms/FormSuccessBlock";
+import { dialCodeForCountryName, sortedAdmissionCountries } from "@/data/admission-shared";
+import { isValidPhoneLocalDigits, normalizePhoneLocalDigits } from "@/lib/formValidation";
 
 // ============================================================
 // DONNÉES
@@ -274,11 +278,13 @@ export default function ContactPage() {
   const [prenom, setPrenom] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [phoneDialCountry, setPhoneDialCountry] = useState("Côte d'Ivoire");
+  const [whatsappDialCountry, setWhatsappDialCountry] = useState("Côte d'Ivoire");
 
-  const phoneCode = useMemo(() => {
-    const c = countries.find((c) => c.name === selectedCountry);
-    return c ? c.code : "+225";
-  }, [selectedCountry]);
+  const phoneDialCode = useMemo(() => dialCodeForCountryName(phoneDialCountry), [phoneDialCountry]);
+  const whatsappDialCode = useMemo(() => dialCodeForCountryName(whatsappDialCountry), [whatsappDialCountry]);
+  const sortedDialCountries = useMemo(() => sortedAdmissionCountries(), []);
 
   const availableNiveaux = useMemo(() => {
     if (!selectedDomaine || !domaines[selectedDomaine]) return {};
@@ -388,11 +394,19 @@ export default function ContactPage() {
       }
     }
     if (!email.trim() || !email.includes("@")) {
-      setStepError("Veuillez renseigner un email professionnel valide.");
+      setStepError("Veuillez renseigner une adresse email valide.");
       return false;
     }
     if (!phone.trim()) {
       setStepError("Veuillez renseigner votre numéro de téléphone.");
+      return false;
+    }
+    if (!isValidPhoneLocalDigits(phone)) {
+      setStepError("Téléphone : chiffres uniquement (6 à 15), sans indicatif.");
+      return false;
+    }
+    if (whatsapp.trim() && !isValidPhoneLocalDigits(whatsapp)) {
+      setStepError("WhatsApp : chiffres uniquement (6 à 15), sans indicatif.");
       return false;
     }
 
@@ -465,8 +479,8 @@ export default function ContactPage() {
       date_of_birth: dateOfBirth,
       function_title: fonction,
       email: email,
-      phone: `${phoneCode} ${phone}`,
-      whatsapp: `${phoneCode} ${formData.get("whatsapp") || ""}`,
+      phone: `${phoneDialCode} ${phone}`.trim(),
+      whatsapp: `${whatsappDialCode} ${whatsapp || ""}`.trim(),
       country: selectedCountry,
       linkedin_url: formData.get("linkedin") || "",
       level_requested: selectedNiveau,
@@ -532,6 +546,9 @@ export default function ContactPage() {
       setPrenom("");
       setEmail("");
       setPhone("");
+      setWhatsapp("");
+      setPhoneDialCountry("Côte d'Ivoire");
+      setWhatsappDialCountry("Côte d'Ivoire");
       setBirthYear("");
       setBirthMonth("");
       setBirthDay("");
@@ -599,10 +616,8 @@ export default function ContactPage() {
             </div>
 
             {success && (
-              <div className="mt-4 rounded-xl border border-green-500/30 bg-green-500/10 p-5 text-center text-sm leading-relaxed text-green-400">
-                <p className="font-medium">Demande envoyée avec succès.</p>
-                <p className="mt-2 text-[#C8C8CF]">Notre équipe vous contactera sous 24h.</p>
-                <p className="mt-3 text-xs text-[#9999A9]">Ce message reste affiché environ 5 secondes.</p>
+              <div className="mt-4">
+                <FormSuccessBlock />
               </div>
             )}
 
@@ -629,7 +644,6 @@ export default function ContactPage() {
                         <option value="hub">UltraBoost Hub</option>
                         <option value="travel">TravelBootcamps</option>
                         <option value="language">Bootcamps Langues</option>
-                        <option value="community">Community</option>
                         <option value="event">Événements</option>
                       </select>
                     </label>
@@ -839,26 +853,65 @@ export default function ContactPage() {
                     )}
 
                     <label className="block">
-                      <span className={labelCls}>Email professionnel</span>
+                      <span className={labelCls}>Email</span>
                       <span className={hintCls}>Adresse à laquelle nous pouvons vous répondre.</span>
                       <input value={email} onChange={(e) => { setEmail(e.target.value); setStepError(""); }} required type="email" className={inputCls} />
                     </label>
 
                     <div className="grid gap-4 sm:grid-cols-2">
                       <label className="block">
-                        <span className={labelCls}>Téléphone ({phoneCode})</span>
-                        <span className={hintCls}>Numéro joignable (indicatif déjà affiché).</span>
-                        <div className="flex">
-                          <span className="flex items-center rounded-l-lg border border-r-0 border-[rgba(255,255,255,0.08)] bg-[rgba(26,26,37,0.8)] px-3 text-xs text-[#C9A84C]">{phoneCode}</span>
-                          <input value={phone} onChange={(e) => { setPhone(e.target.value); setStepError(""); }} required type="tel" placeholder="XX XX XX XX" className="glass-input w-full rounded-l-none px-4 py-3 text-sm" />
+                        <span className={labelCls}>Téléphone</span>
+                        <span className={hintCls}>Indicatif pays au choix, puis chiffres uniquement.</span>
+                        <div className="mt-2 flex min-w-0">
+                          <select
+                            value={phoneDialCountry}
+                            onChange={(e) => { setPhoneDialCountry(e.target.value); setStepError(""); }}
+                            className="glass-input max-w-[min(48%,220px)] shrink-0 rounded-r-none border-r-0 px-2 py-3 text-[11px] sm:text-sm"
+                            aria-label="Indicatif téléphone"
+                          >
+                            {sortedDialCountries.map((c) => (
+                              <option key={`tel-${c.name}`} value={c.name}>
+                                {c.flag} {c.code}
+                              </option>
+                            ))}
+                          </select>
+                          <input
+                            value={phone}
+                            onChange={(e) => { setPhone(normalizePhoneLocalDigits(e.target.value)); setStepError(""); }}
+                            required
+                            type="tel"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            autoComplete="tel-national"
+                            className="glass-input min-w-0 flex-1 rounded-l-none px-4 py-3 text-sm"
+                          />
                         </div>
                       </label>
                       <label className="block">
-                        <span className={labelCls}>WhatsApp ({phoneCode})</span>
+                        <span className={labelCls}>WhatsApp</span>
                         <span className={hintCls}>Facultatif.</span>
-                        <div className="flex">
-                          <span className="flex items-center rounded-l-lg border border-r-0 border-[rgba(255,255,255,0.08)] bg-[rgba(26,26,37,0.8)] px-3 text-xs text-[#C9A84C]">{phoneCode}</span>
-                          <input name="whatsapp" type="tel" placeholder="XX XX XX XX" className="glass-input w-full rounded-l-none px-4 py-3 text-sm" />
+                        <div className="mt-2 flex min-w-0">
+                          <select
+                            value={whatsappDialCountry}
+                            onChange={(e) => { setWhatsappDialCountry(e.target.value); setStepError(""); }}
+                            className="glass-input max-w-[min(48%,220px)] shrink-0 rounded-r-none border-r-0 px-2 py-3 text-[11px] sm:text-sm"
+                            aria-label="Indicatif WhatsApp"
+                          >
+                            {sortedDialCountries.map((c) => (
+                              <option key={`wa-${c.name}`} value={c.name}>
+                                {c.flag} {c.code}
+                              </option>
+                            ))}
+                          </select>
+                          <input
+                            value={whatsapp}
+                            onChange={(e) => { setWhatsapp(normalizePhoneLocalDigits(e.target.value)); setStepError(""); }}
+                            type="tel"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            autoComplete="tel-national"
+                            className="glass-input min-w-0 flex-1 rounded-l-none px-4 py-3 text-sm"
+                          />
                         </div>
                       </label>
                     </div>
@@ -921,26 +974,7 @@ export default function ContactPage() {
                       <textarea name="message" rows={3} className="glass-input w-full resize-none px-4 py-3 text-sm" />
                     </label>
 
-                    <div className="flex items-start gap-3 rounded-xl border border-[rgba(212,175,55,0.12)] bg-white/[0.02] px-4 py-3">
-                      <input id="contact-terms" name="terms" required type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 accent-[#D4AF37]" />
-                      <label htmlFor="contact-terms" className="text-sm text-[#C8C8CF]">
-                        <span className="block">
-                          J&apos;accepte les{" "}
-                          <span className="text-[#D4AF37]">Conditions Générales d&apos;Utilisation (CGU)</span>
-                          {" "}d&apos;UltraBoost — obligatoire avant validation.
-                        </span>
-                        <span className="mt-2 block">
-                          <Link
-                            href="/cgu"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-[#D4AF37] underline decoration-[rgba(212,175,55,0.45)] underline-offset-4 hover:text-[#E8D5A3]"
-                          >
-                            Lire les conditions
-                          </Link>
-                        </span>
-                      </label>
-                    </div>
+                    <FormCguAcceptance id="contact-terms" />
 
                     {error && <p className="text-sm text-red-400">{error}</p>}
 

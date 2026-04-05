@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ADMISSION_COUNTRIES,
   ADMISSION_DOMAINES,
   ADMISSION_FONCTIONS,
   ADMISSION_MONTHS,
@@ -11,7 +10,11 @@ import {
   TRAVEL_DESTINATION_OPTIONS,
   TRAVEL_SESSION_OPTIONS,
   admissionBirthYears,
+  dialCodeForCountryName,
+  sortedAdmissionCountries,
 } from "@/data/admission-shared";
+import { FormCguAcceptance } from "@/components/forms/FormCguAcceptance";
+import { FormSuccessBlock } from "@/components/forms/FormSuccessBlock";
 import { normalizePhoneLocalDigits, isValidPhoneLocalDigits } from "@/lib/formValidation";
 
 export type AdmissionWizardVariant = "home" | "bootcamp" | "hub" | "travel" | "language" | "community";
@@ -55,6 +58,8 @@ export function AdmissionFormWizard({
   const [stepError, setStepError] = useState("");
   const [step, setStep] = useState(1);
 
+  const [phoneDialCountry, setPhoneDialCountry] = useState("Côte d'Ivoire");
+  const [whatsappDialCountry, setWhatsappDialCountry] = useState("Côte d'Ivoire");
   const [selectedCountry, setSelectedCountry] = useState("Côte d'Ivoire");
   const [selectedFonction, setSelectedFonction] = useState("");
   const [showAutreFonction, setShowAutreFonction] = useState(false);
@@ -82,16 +87,11 @@ export function AdmissionFormWizard({
   const [travelDestination, setTravelDestination] = useState("");
   const [travelPeriod, setTravelPeriod] = useState("");
 
-  const phoneCode = useMemo(() => {
-    const c = ADMISSION_COUNTRIES.find((x) => x.name === selectedCountry);
-    if (c?.code) return c.code;
-    return "+225";
-  }, [selectedCountry]);
+  const phoneDialCode = useMemo(() => dialCodeForCountryName(phoneDialCountry), [phoneDialCountry]);
+  const whatsappDialCode = useMemo(() => dialCodeForCountryName(whatsappDialCountry), [whatsappDialCountry]);
 
-  const sortedCountries = useMemo(
-    () => [...ADMISSION_COUNTRIES].sort((a, b) => a.name.localeCompare(b.name, "fr", { sensitivity: "base" })),
-    [],
-  );
+  const sortedCountries = useMemo(() => sortedAdmissionCountries(), []);
+  const sortedDialCountries = sortedCountries;
   const sortedFonctions = useMemo(
     () => [...ADMISSION_FONCTIONS].sort((a, b) => a.localeCompare(b, "fr", { sensitivity: "base" })),
     [],
@@ -275,7 +275,7 @@ export function AdmissionFormWizard({
       }
     }
     if (!email.trim() || !email.includes("@")) {
-      setStepError("Veuillez renseigner un email professionnel valide.");
+      setStepError("Veuillez renseigner une adresse email valide.");
       return false;
     }
     if (!phone.trim()) {
@@ -335,6 +335,9 @@ export function AdmissionFormWizard({
     setPrenom("");
     setEmail("");
     setPhone("");
+    setWhatsapp("");
+    setPhoneDialCountry("Côte d'Ivoire");
+    setWhatsappDialCountry("Côte d'Ivoire");
     setBirthYear("");
     setBirthMonth("");
     setBirthDay("");
@@ -378,8 +381,8 @@ export function AdmissionFormWizard({
       date_of_birth: dateOfBirth,
       function_title: fonction,
       email,
-      phone: `${phoneCode} ${phone}`.trim(),
-      whatsapp: `${phoneCode} ${whatsapp || ""}`.trim(),
+      phone: `${phoneDialCode} ${phone}`.trim(),
+      whatsapp: `${whatsappDialCode} ${whatsapp || ""}`.trim(),
       country: selectedCountry,
       linkedin_url: formData.get("linkedin") || "",
       level_requested: selectedNiveau,
@@ -400,12 +403,9 @@ export function AdmissionFormWizard({
     }
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_XANO_API_URL;
-      if (!apiUrl) throw new Error("NEXT_PUBLIC_XANO_API_URL est manquante dans .env.local");
-
-      const res = await fetch(`${apiUrl}/admission`, {
+      const res = await fetch("/admission", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(payload),
       });
 
@@ -468,9 +468,8 @@ export function AdmissionFormWizard({
       )}
 
       {success && (
-        <div className="mb-4 rounded-xl border border-green-500/30 bg-green-500/10 p-4 text-center text-sm text-green-400">
-          Votre demande a bien été enregistrée. Merci — nous revenons vers vous très prochainement. (Ce message disparaît
-          sous 5 secondes.)
+        <div className="mb-4">
+          <FormSuccessBlock />
         </div>
       )}
 
@@ -538,7 +537,6 @@ export function AdmissionFormWizard({
                     <option value="hub">UltraBoost Hub</option>
                     <option value="travel">TravelBootcamps</option>
                     <option value="language">Bootcamps Langues</option>
-                    <option value="community">Community</option>
                     <option value="event">Événements</option>
                   </select>
                 </label>
@@ -1000,8 +998,8 @@ export function AdmissionFormWizard({
               )}
 
               <label className="block">
-                <span className={labelCls}>Email professionnel</span>
-                <span className={hintCls}>Une adresse que vous consultez régulièrement (idéalement professionnelle).</span>
+                <span className={labelCls}>Email</span>
+                <span className={hintCls}>Une adresse que vous consultez régulièrement.</span>
                 <input
                   value={email}
                   onChange={(e) => {
@@ -1016,11 +1014,24 @@ export function AdmissionFormWizard({
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block">
-                  <span className={labelCls}>Téléphone ({phoneCode || "—"})</span>
-                  <div className="flex">
-                    <span className="flex items-center rounded-l-lg border border-r-0 border-[rgba(255,255,255,0.08)] bg-[rgba(26,26,37,0.8)] px-3 text-xs text-[#C9A84C]">
-                      {phoneCode || "—"}
-                    </span>
+                  <span className={labelCls}>Téléphone</span>
+                  <span className={hintCls}>Indicatif pays au choix, puis chiffres uniquement.</span>
+                  <div className="mt-2 flex min-w-0">
+                    <select
+                      value={phoneDialCountry}
+                      onChange={(e) => {
+                        setPhoneDialCountry(e.target.value);
+                        setStepError("");
+                      }}
+                      className="glass-input max-w-[min(48%,220px)] shrink-0 rounded-r-none border-r-0 px-2 py-3 text-[11px] sm:text-sm"
+                      aria-label="Indicatif téléphone"
+                    >
+                      {sortedDialCountries.map((c) => (
+                        <option key={`tel-${c.name}`} value={c.name}>
+                          {c.flag} {c.code}
+                        </option>
+                      ))}
+                    </select>
                     <input
                       value={phone}
                       onChange={(e) => {
@@ -1028,7 +1039,7 @@ export function AdmissionFormWizard({
                         setPhone(next);
                         setPhoneError(
                           next && !isValidPhoneLocalDigits(next)
-                            ? "Numéro invalide : chiffres uniquement (ex. 0710008282 ou +225 collé)."
+                            ? "Chiffres uniquement (6 à 15), sans indicatif."
                             : "",
                         );
                         setStepError("");
@@ -1036,19 +1047,32 @@ export function AdmissionFormWizard({
                       required
                       type="tel"
                       inputMode="numeric"
+                      pattern="[0-9]*"
                       autoComplete="tel-national"
-                      placeholder="07 10 00 82 82"
-                      className="glass-input w-full rounded-l-none px-4 py-3 text-sm"
+                      className="glass-input min-w-0 flex-1 rounded-l-none px-4 py-3 text-sm"
                     />
                   </div>
                   {phoneError && <p className="mt-2 text-xs text-red-400">{phoneError}</p>}
                 </label>
                 <label className="block">
-                  <span className={labelCls}>WhatsApp ({phoneCode || "—"})</span>
-                  <div className="flex">
-                    <span className="flex items-center rounded-l-lg border border-r-0 border-[rgba(255,255,255,0.08)] bg-[rgba(26,26,37,0.8)] px-3 text-xs text-[#C9A84C]">
-                      {phoneCode || "—"}
-                    </span>
+                  <span className={labelCls}>WhatsApp</span>
+                  <span className={hintCls}>Facultatif.</span>
+                  <div className="mt-2 flex min-w-0">
+                    <select
+                      value={whatsappDialCountry}
+                      onChange={(e) => {
+                        setWhatsappDialCountry(e.target.value);
+                        setStepError("");
+                      }}
+                      className="glass-input max-w-[min(48%,220px)] shrink-0 rounded-r-none border-r-0 px-2 py-3 text-[11px] sm:text-sm"
+                      aria-label="Indicatif WhatsApp"
+                    >
+                      {sortedDialCountries.map((c) => (
+                        <option key={`wa-${c.name}`} value={c.name}>
+                          {c.flag} {c.code}
+                        </option>
+                      ))}
+                    </select>
                     <input
                       value={whatsapp}
                       onChange={(e) => {
@@ -1056,7 +1080,7 @@ export function AdmissionFormWizard({
                         setWhatsapp(next);
                         setWhatsappError(
                           next && !isValidPhoneLocalDigits(next)
-                            ? "Numéro invalide : chiffres uniquement."
+                            ? "Chiffres uniquement (6 à 15), sans indicatif."
                             : "",
                         );
                         setStepError("");
@@ -1064,9 +1088,9 @@ export function AdmissionFormWizard({
                       name="whatsapp"
                       type="tel"
                       inputMode="numeric"
+                      pattern="[0-9]*"
                       autoComplete="tel-national"
-                      placeholder="07 10 00 82 82"
-                      className="glass-input w-full rounded-l-none px-4 py-3 text-sm"
+                      className="glass-input min-w-0 flex-1 rounded-l-none px-4 py-3 text-sm"
                     />
                   </div>
                   {whatsappError && <p className="mt-2 text-xs text-red-400">{whatsappError}</p>}
@@ -1149,12 +1173,7 @@ export function AdmissionFormWizard({
                 <textarea name="message" rows={3} className="glass-input w-full resize-none px-4 py-3 text-sm" />
               </label>
 
-              <label className="flex items-start gap-3 rounded-xl border border-[rgba(212,175,55,0.12)] bg-white/[0.02] px-4 py-3">
-                <input name="terms" required type="checkbox" className="mt-0.5 h-4 w-4 accent-[#D4AF37]" />
-                <span className="text-sm text-[#C8C8CF]">
-                  J&apos;accepte les conditions générales d&apos;UltraBoost
-                </span>
-              </label>
+              <FormCguAcceptance id="admission-wizard-terms" />
 
               {error && <p className="text-sm text-red-400">{error}</p>}
 

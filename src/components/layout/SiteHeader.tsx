@@ -4,11 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { SITE_NAV_LINKS } from "@/components/layout/site-nav";
+import { SiteBrandedLogo } from "@/components/layout/SiteBrandedLogo";
 
 const linkClass =
   "whitespace-nowrap text-xs text-[#C8C8CF] transition hover:text-[#C9A84C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A84C]/60 lg:text-sm";
-
-const LOGO_SRC = "/logo.svg";
 
 export function SiteHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -34,15 +33,7 @@ export function SiteHeader() {
           className="flex shrink-0 items-center justify-start p-4"
           aria-label="UltraBoost Executive — accueil"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element -- asset statique public/logo.svg */}
-          <img
-            src={LOGO_SRC}
-            alt="UltraBoost"
-            width={48}
-            height={48}
-            className="size-12 shrink-0 object-contain"
-            decoding="async"
-          />
+          <SiteBrandedLogo imgClassName="size-12 shrink-0 object-contain" gradientIdSuffix="header" />
         </Link>
 
         <nav

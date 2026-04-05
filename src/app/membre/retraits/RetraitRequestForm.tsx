@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FormSuccessBlock } from "@/components/forms/FormSuccessBlock";
 
 const MIN_WITHDRAWAL_FCFA = 15_000;
 
@@ -16,12 +17,12 @@ export function RetraitRequestForm() {
   const [details, setDetails] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [success, setSuccess] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    setSuccess("");
+    setSuccess(false);
     setLoading(true);
     try {
       const amount_fcfa = Number(amount.replace(/[^\d]/g, ""));
@@ -52,7 +53,7 @@ export function RetraitRequestForm() {
         setError(data.error || "Demande impossible.");
         return;
       }
-      setSuccess("Demande de retrait envoyée. Traitement sous validation.");
+      setSuccess(true);
       setAmount("");
       setMethod("");
       setDetails("");
@@ -110,7 +111,11 @@ export function RetraitRequestForm() {
       </label>
 
       {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
-      {success && <p className="mt-3 text-sm text-green-400">{success}</p>}
+      {success && (
+        <div className="mt-3">
+          <FormSuccessBlock />
+        </div>
+      )}
 
       <button type="submit" disabled={loading} className="btn-gold mt-4 w-full py-3 text-sm">
         {loading ? "Envoi…" : "Envoyer la demande"}

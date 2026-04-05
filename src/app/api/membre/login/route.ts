@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   const password = typeof body.password === "string" ? body.password : "";
 
   if (!email || !email.includes("@")) {
-    return NextResponse.json({ error: "Email professionnel requis." }, { status: 400 });
+    return NextResponse.json({ error: "Email requis." }, { status: 400 });
   }
 
   if (isMembreLoginStub()) {

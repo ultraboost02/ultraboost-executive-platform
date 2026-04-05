@@ -23,11 +23,11 @@ export async function POST(req: NextRequest) {
   const base = getXanoPublicBaseUrl();
   const key = getXanoApiKey();
   const forwardBase = env("XANO_SERVER_BASE_URL") || base;
-  const forwardKey = env("XANO_SERVER_API_KEY") || key;
+  const forwardKey = (env("XANO_SERVER_API_KEY") || key).trim();
 
-  if (!forwardBase || !forwardKey) {
+  if (!forwardBase) {
     return NextResponse.json(
-      { error: "Xano non configuré côté serveur (XANO_SERVER_BASE_URL/XANO_SERVER_API_KEY ou NEXT_PUBLIC_XANO_API_URL/XANO_API_KEY)." },
+      { error: "URL Xano manquante : définissez NEXT_PUBLIC_XANO_API_URL ou XANO_SERVER_BASE_URL sur le serveur." },
       { status: 500 },
     );
   }
@@ -38,18 +38,31 @@ export async function POST(req: NextRequest) {
   };
 
   const xanoUrl = `${forwardBase.replace(/\/$/, "")}/admission`;
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+  if (forwardKey) {
+    headers.Authorization = `Bearer ${forwardKey}`;
+  }
+
   const res = await fetch(xanoUrl, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${forwardKey}`,
-    },
+    headers,
     body: JSON.stringify(payload),
   });
 
   const text = await res.text();
   if (!res.ok) {
+    if (res.status === 401 && !forwardKey) {
+      return NextResponse.json(
+        {
+          error: "Xano a refusé la requête sans authentification.",
+          detail: "Ajoutez XANO_API_KEY (ou XANO_SERVER_API_KEY) dans les variables d’environnement du serveur.",
+        },
+        { status: 502 },
+      );
+    }
     return NextResponse.json({ error: "Erreur Xano.", detail: text.slice(0, 600) }, { status: 502 });
   }
 

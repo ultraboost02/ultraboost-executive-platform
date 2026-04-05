@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { AdmissionFormWizard } from "@/components/admission/AdmissionFormWizard";
-import { UltraBoostCommunitySection } from "@/components/community/UltraBoostCommunitySection";
 
 const hubCards = [
   {
@@ -280,7 +279,6 @@ export default function HubPage() {
           ))}
         </div>
 
-        <UltraBoostCommunitySection />
       </main>
 
       <SiteFooter />

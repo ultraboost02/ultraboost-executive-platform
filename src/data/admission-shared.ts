@@ -349,3 +349,13 @@ export const TRAVEL_SESSION_OPTIONS = [
 
 /** @deprecated Utiliser TRAVEL_SESSION_OPTIONS */
 export const TRAVEL_PERIOD_OPTIONS = TRAVEL_SESSION_OPTIONS;
+
+export function dialCodeForCountryName(countryName: string): string {
+  const c = ADMISSION_COUNTRIES.find((x) => x.name === countryName);
+  if (c?.code) return c.code;
+  return "+225";
+}
+
+export function sortedAdmissionCountries(): AdmissionCountry[] {
+  return [...ADMISSION_COUNTRIES].sort((a, b) => a.name.localeCompare(b.name, "fr", { sensitivity: "base" }));
+}

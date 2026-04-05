@@ -30,6 +30,11 @@ export type XanoMembreDashboard = {
   first_name?: string | null;
   last_name?: string | null;
   email?: string | null;
+  /**
+   * Niveau de suivi bootcamp (ex. ecosystem, specialist, manager, director, executive).
+   * À renseigner côté Xano pour afficher l’accès communautaire / agenda personnalisé sur le tableau de bord.
+   */
+  bootcamp_track?: string | null;
 };
 
 /** Une ligne issue de la table commission (liste pour GET /membre/commissions). */

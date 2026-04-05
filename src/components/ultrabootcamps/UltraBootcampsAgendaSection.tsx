@@ -156,7 +156,7 @@ export function UltraBootcampsAgendaSection({ activeBootcampLevelId }: Props) {
                   onClick={() => openRequest(row)}
                   className="btn-gold mt-5 w-full py-3 text-xs font-semibold uppercase tracking-wider sm:text-sm"
                 >
-                  Demander la date &amp; le programme
+                  Activer mon accès
                 </button>
               </article>
             );

@@ -3,11 +3,14 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
-  ADMISSION_COUNTRIES,
   ADMISSION_FONCTIONS,
   ADMISSION_MONTHS,
   admissionBirthYears,
+  dialCodeForCountryName,
+  sortedAdmissionCountries,
 } from "@/data/admission-shared";
+import { FormCguAcceptance } from "@/components/forms/FormCguAcceptance";
+import { FormSuccessBlock } from "@/components/forms/FormSuccessBlock";
 import {
   ULTRA_BOOTCAMP_AGENDA_MONTHS,
   ULTRA_BOOTCAMP_AGENDA_YEAR,
@@ -48,6 +51,8 @@ export function EventAgendaAccessForm({
   const [success, setSuccess] = useState(false);
 
   const [eventTrack, setEventTrack] = useState<AgendaTrackKey>(defaultTrack);
+  const [phoneDialCountry, setPhoneDialCountry] = useState("Côte d'Ivoire");
+  const [whatsappDialCountry, setWhatsappDialCountry] = useState("Côte d'Ivoire");
   const [selectedCountry, setSelectedCountry] = useState("Côte d'Ivoire");
   const [selectedFonction, setSelectedFonction] = useState("");
   const [showAutreFonction, setShowAutreFonction] = useState(false);
@@ -66,15 +71,11 @@ export function EventAgendaAccessForm({
     return Array.from({ length: daysInMonth }, (_, i) => i + 1);
   }, [birthYear, birthMonth]);
 
-  const phoneCode = useMemo(() => {
-    const c = ADMISSION_COUNTRIES.find((x) => x.name === selectedCountry);
-    return c?.code ?? "+225";
-  }, [selectedCountry]);
+  const phoneDialCode = useMemo(() => dialCodeForCountryName(phoneDialCountry), [phoneDialCountry]);
+  const whatsappDialCode = useMemo(() => dialCodeForCountryName(whatsappDialCountry), [whatsappDialCountry]);
 
-  const sortedCountries = useMemo(
-    () => [...ADMISSION_COUNTRIES].sort((a, b) => a.name.localeCompare(b.name, "fr", { sensitivity: "base" })),
-    [],
-  );
+  const sortedCountries = useMemo(() => sortedAdmissionCountries(), []);
+  const sortedDialCountries = sortedCountries;
   const sortedFonctions = useMemo(
     () => [...ADMISSION_FONCTIONS].sort((a, b) => a.localeCompare(b, "fr", { sensitivity: "base" })),
     [],
@@ -91,7 +92,7 @@ export function EventAgendaAccessForm({
     setError("");
     setLoading(true);
     if (!isValidPhoneLocalDigits(phone)) {
-      setError("Mobile invalide : chiffres uniquement (6 à 15).");
+      setError("Téléphone invalide : chiffres uniquement (6 à 15), sans indicatif.");
       setLoading(false);
       return;
     }
@@ -132,8 +133,8 @@ export function EventAgendaAccessForm({
       date_of_birth: dateOfBirth,
       function_title: fonction,
       email: formData.get("email") || "",
-      phone: `${phoneCode} ${phone || ""}`.trim(),
-      whatsapp: `${phoneCode} ${whatsapp || ""}`.trim(),
+      phone: `${phoneDialCode} ${phone || ""}`.trim(),
+      whatsapp: `${whatsappDialCode} ${whatsapp || ""}`.trim(),
       country: selectedCountry,
       linkedin_url: formData.get("linkedin") || "",
       level_requested: eventTrack,
@@ -151,12 +152,9 @@ export function EventAgendaAccessForm({
     };
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_XANO_API_URL;
-      if (!apiUrl) throw new Error("NEXT_PUBLIC_XANO_API_URL est manquante dans .env.local");
-
-      const res = await fetch(`${apiUrl}/admission`, {
+      const res = await fetch("/admission", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(payload),
       });
 
@@ -183,12 +181,8 @@ export function EventAgendaAccessForm({
 
   if (success) {
     return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-8 text-center">
-        <p className="text-green-400">
-          {agendaAccessMode(eventTrack) === "validated"
-            ? "Demande enregistrée. Notre équipe valide les accès Director & Executive sous 48h — vous recevrez la date exacte et le programme par canal sécurisé."
-            : "Demande enregistrée. Un conseiller vous transmet la date précise, le programme détaillé et les modalités d’accès membre."}
-        </p>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-4">
+        <FormSuccessBlock />
       </motion.div>
     );
   }
@@ -255,39 +249,6 @@ export function EventAgendaAccessForm({
       </div>
 
       <label className="block">
-        <span className={labelCls}>Mobile</span>
-        <div className="flex">
-          <span className="flex items-center rounded-l-lg border border-r-0 border-[rgba(255,255,255,0.08)] bg-[rgba(26,26,37,0.8)] px-3 text-xs text-[#C9A84C]">
-            {phoneCode}
-          </span>
-          <input
-            name="phone"
-            required
-            type="tel"
-            autoComplete="tel"
-            inputMode="numeric"
-            value={phone}
-            onChange={(e) => {
-              const next = normalizePhoneLocalDigits(e.target.value);
-              setPhone(next);
-              setPhoneError(
-                next && !isValidPhoneLocalDigits(next)
-                  ? "Numéro invalide (ex. 0710008282 ou +225 collé)."
-                  : "",
-              );
-            }}
-            className="glass-input w-full rounded-l-none px-4 py-3 text-sm"
-          />
-        </div>
-        {phoneError && <p className="mt-2 text-xs text-red-400">{phoneError}</p>}
-      </label>
-
-      <label className="block">
-        <span className={labelCls}>Email</span>
-        <input name="email" type="email" required autoComplete="email" className={inputCls} />
-      </label>
-
-      <label className="block">
         <span className={labelCls}>Pays de résidence</span>
         <select value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value)} required className={selectCls}>
           {sortedCountries.map((c) => (
@@ -296,6 +257,78 @@ export function EventAgendaAccessForm({
             </option>
           ))}
         </select>
+      </label>
+
+      <label className="block">
+        <span className={labelCls}>Téléphone</span>
+        <div className="flex min-w-0">
+          <select
+            value={phoneDialCountry}
+            onChange={(e) => setPhoneDialCountry(e.target.value)}
+            className="glass-input max-w-[min(48%,220px)] shrink-0 rounded-r-none border-r-0 px-2 py-3 text-[11px] sm:text-sm"
+            aria-label="Indicatif téléphone"
+          >
+            {sortedDialCountries.map((c) => (
+              <option key={`tel-${c.name}`} value={c.name}>
+                {c.flag} {c.code}
+              </option>
+            ))}
+          </select>
+          <input
+            name="phone"
+            required
+            type="tel"
+            autoComplete="tel-national"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={phone}
+            onChange={(e) => {
+              const next = normalizePhoneLocalDigits(e.target.value);
+              setPhone(next);
+              setPhoneError(next && !isValidPhoneLocalDigits(next) ? "Chiffres uniquement (6 à 15), sans indicatif." : "");
+            }}
+            className="glass-input min-w-0 flex-1 rounded-l-none px-4 py-3 text-sm"
+          />
+        </div>
+        {phoneError && <p className="mt-2 text-xs text-red-400">{phoneError}</p>}
+      </label>
+
+      <label className="block">
+        <span className={labelCls}>WhatsApp</span>
+        <div className="flex min-w-0">
+          <select
+            value={whatsappDialCountry}
+            onChange={(e) => setWhatsappDialCountry(e.target.value)}
+            className="glass-input max-w-[min(48%,220px)] shrink-0 rounded-r-none border-r-0 px-2 py-3 text-[11px] sm:text-sm"
+            aria-label="Indicatif WhatsApp"
+          >
+            {sortedDialCountries.map((c) => (
+              <option key={`wa-${c.name}`} value={c.name}>
+                {c.flag} {c.code}
+              </option>
+            ))}
+          </select>
+          <input
+            name="whatsapp"
+            type="tel"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            autoComplete="tel-national"
+            value={whatsapp}
+            onChange={(e) => {
+              const next = normalizePhoneLocalDigits(e.target.value);
+              setWhatsapp(next);
+              setWhatsappError(next && !isValidPhoneLocalDigits(next) ? "Chiffres uniquement (6 à 15), sans indicatif." : "");
+            }}
+            className="glass-input min-w-0 flex-1 rounded-l-none px-4 py-3 text-sm"
+          />
+        </div>
+        {whatsappError && <p className="mt-2 text-xs text-red-400">{whatsappError}</p>}
+      </label>
+
+      <label className="block">
+        <span className={labelCls}>Email</span>
+        <input name="email" type="email" required autoComplete="email" className={inputCls} />
       </label>
 
       <label className="block">
@@ -350,37 +383,12 @@ export function EventAgendaAccessForm({
         <input name="linkedin" type="url" className={inputCls} placeholder="https://linkedin.com/in/..." />
       </label>
 
-      <label className="block">
-        <span className={labelCls}>WhatsApp ({phoneCode})</span>
-        <div className="flex">
-          <span className="flex items-center rounded-l-lg border border-r-0 border-[rgba(255,255,255,0.08)] bg-[rgba(26,26,37,0.8)] px-3 text-xs text-[#C9A84C]">
-            {phoneCode}
-          </span>
-          <input
-            name="whatsapp"
-            type="tel"
-            inputMode="numeric"
-            value={whatsapp}
-            onChange={(e) => {
-              const next = normalizePhoneLocalDigits(e.target.value);
-              setWhatsapp(next);
-              setWhatsappError(next && !isValidPhoneLocalDigits(next) ? "Numéro invalide." : "");
-            }}
-            className="glass-input w-full rounded-l-none px-4 py-3 text-sm"
-          />
-        </div>
-        {whatsappError && <p className="mt-2 text-xs text-red-400">{whatsappError}</p>}
-      </label>
-
-      <label className="flex items-start gap-3 rounded-xl border border-[rgba(212,175,55,0.12)] bg-white/[0.02] px-4 py-3">
-        <input name="terms" required type="checkbox" className="mt-0.5 h-4 w-4 accent-[#D4AF37]" />
-        <span className="text-sm text-[#C8C8CF]">J&apos;accepte les conditions générales d&apos;UltraBoost</span>
-      </label>
+      <FormCguAcceptance id="event-agenda-terms" />
 
       {error && <p className="text-sm text-red-400">{error}</p>}
 
       <button type="submit" disabled={loading} className="btn-gold w-full py-3 text-sm">
-        {loading ? "Envoi…" : "Envoyer la demande"}
+        {loading ? "Envoi…" : "Activer mon accès"}
       </button>
     </form>
   );

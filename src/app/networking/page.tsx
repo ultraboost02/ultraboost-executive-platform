@@ -119,9 +119,6 @@ export default function NetworkingPage() {
           >
             Hub de Mise en Relation
           </h1>
-          <p className="mt-6 max-w-3xl text-base leading-relaxed text-[#C8C8CF] sm:text-lg">
-            Connectez-vous avec nos talents certifiés et développez votre réseau professionnel
-          </p>
           <div className="divider-gold mt-8 max-w-2xl" />
         </motion.section>
 
@@ -170,38 +167,6 @@ export default function NetworkingPage() {
           ))}
         </div>
 
-        <section className="mt-16">
-          <h2 className="text-2xl font-semibold text-[#F5F5F7]" style={{ fontFamily: '"Playfair Display", serif' }}>
-            Types de Demandes
-          </h2>
-          <div className="mt-6 flex flex-wrap gap-3">
-            {[
-              { emoji: "💼", text: "Recrutement — Freelance, Temps partiel, Plein temps" },
-              { emoji: "🤝", text: "Partenariats — Recherche de partenaires stratégiques" },
-              { emoji: "🚀", text: "Projets IA/Digital — Opportunités de collaboration" },
-            ].map((b) => (
-              <span
-                key={b.text}
-                className="inline-flex items-center gap-2 rounded-full border border-[rgba(201,168,76,0.25)] bg-white/[0.04] px-4 py-2 text-xs text-[#C8C8CF] sm:text-sm"
-              >
-                <span>{b.emoji}</span> {b.text}
-              </span>
-            ))}
-          </div>
-        </section>
-
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="glass-card-gold mt-14 border border-[rgba(201,168,76,0.2)] p-8"
-        >
-          <p className="text-lg text-[#D4AF37]">💡 Tarification Personnalisée</p>
-          <p className="mt-3 text-sm leading-relaxed text-[#C8C8CF]">
-            Le tarif final sera discuté en fonction de la complexité et de la spécificité de votre besoin. Notre équipe vous
-            accompagne pour trouver la solution optimale.
-          </p>
-        </motion.div>
       </main>
 
       <SiteFooter />

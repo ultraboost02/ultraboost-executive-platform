@@ -65,7 +65,7 @@ export function EventAgendaAccessModal({
                   className="mt-1.5 text-xl font-semibold text-[#F5F5F7] sm:text-2xl"
                   style={{ fontFamily: '"Playfair Display", serif' }}
                 >
-                  Demander la date &amp; le programme
+                  Activer mon accès
                 </h2>
               </div>
               <button

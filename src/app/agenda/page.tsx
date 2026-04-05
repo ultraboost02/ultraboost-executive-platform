@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { SiteBrandedLogo } from "@/components/layout/SiteBrandedLogo";
 import { EventAdmissionForm } from "@/components/admission/EventAdmissionForm";
+import { EventAgendaAccessModal } from "@/components/ultrabootcamps/EventAgendaAccessModal";
 import type { AgendaTrackKey } from "@/data/ultrabootcamps-agenda";
 import {
   AGENDA_PUBLIC_STRUCTURE,
@@ -15,6 +18,8 @@ import {
   agendaEventFormat,
   agendaThemeLine,
 } from "@/data/ultrabootcamps-agenda";
+
+const GENERAL_MONTHS_MAI_NOV = ULTRA_BOOTCAMP_AGENDA_MONTHS.filter((r) => r.monthIndex >= 4 && r.monthIndex <= 10);
 
 type AgendaEvent = {
   month: string;
@@ -27,83 +32,41 @@ type AgendaEvent = {
 const TRACK_ORDER: AgendaTrackKey[] = ["general", "specialist", "manager", "director", "executive"];
 
 const TAB_LABEL: Record<AgendaTrackKey, string> = {
-  general: "Agenda General",
+  general: "Agenda Général",
   specialist: "Agenda SPECIALIST",
   manager: "Agenda MANAGER",
   director: "Agenda DIRECTOR",
   executive: "Agenda EXECUTIVE",
 };
 
-const events: AgendaEvent[] = [
-  {
-    month: "Avril",
-    title: 'SIP & MEET Avril — Apéro « SIP & MEET »',
-    datetime: "Jeudi 09 avril 2026 | 18h00 - 21h00",
-    description: "Rencontre conviviale entre professionnels du digital et de l'IA.",
-    type: "SIP & MEET",
-  },
-  {
-    month: "Mai",
-    title: "RENCONTRE D'INTELLIGENCE",
-    datetime: "Jeudi 14 mai 2026 | 18h00 - 21h00",
-    description:
-      "Forum d'échange entre leaders, managers et experts sur les enjeux stratégiques du digital.",
-    type: "Rencontre",
-  },
-  {
-    month: "Juin",
-    title: "MASTERCLASS GOUVERNANCE DIGITAL & IA",
-    datetime: "Jeudi 18 juin 2026 | 18h00 - 21h00",
-    description: "Découverte d'UltraBoost, de ses programmes et de sa communauté.",
-    type: "Masterclass",
-  },
-  {
-    month: "Juillet",
-    title: "AFTERWORK NETWORKING",
-    datetime: "Jeudi 16 juillet 2026 | 18h00 - 21h00",
-    description: "Soirée networking premium pour connecter entrepreneurs et décideurs.",
-    type: "Afterwork",
-  },
-  {
-    month: "Août",
-    title: 'Apéro « SIP & MEET »',
-    datetime: "Jeudi 27 août 2026 | 18h00 - 21h00",
-    description: "Rencontre conviviale entre professionnels du digital et de l'IA.",
-    type: "SIP & MEET",
-  },
-  {
-    month: "Septembre",
-    title: "MASTERCLASS IA & VENTE",
-    datetime: "Jeudi 24 septembre 2026 | 18h00 - 21h00",
-    description: "Masterclass avancée sur les stratégies commerciales augmentées par l'IA.",
-    type: "Masterclass",
-  },
-  {
-    month: "Octobre",
-    title: "RENCONTRE D'INTELLIGENCE",
-    datetime: "Jeudi 22 octobre 2026 | 18h00 - 21h00",
-    description: "Forum stratégique destiné aux leaders et décideurs.",
-    type: "Rencontre",
-  },
-  {
-    month: "Novembre",
-    title: "JOURNÉE PORTE OUVERTE",
-    datetime: "Jeudi 12 novembre 2026 | 18h00 - 21h00",
-    description: "Présentation des programmes et découverte de l'écosystème UltraBoost.",
-    type: "Portes ouvertes",
-  },
-  {
-    month: "Décembre",
-    title: "AFTERWORK NETWORKING",
-    datetime: "Jeudi 10 décembre 2026 | 18h00 - 21h00",
-    description: "Soirée de fin d'année dédiée au networking professionnel.",
-    type: "Afterwork",
-  },
-];
+/** Seul événement affiché sous Agenda Général — SIP & MEET Avril */
+const SIP_MEET_AVRIL: AgendaEvent = {
+  month: "Avril",
+  title: 'SIP & MEET Avril — Apéro « SIP & MEET »',
+  datetime: "Jeudi 09 avril 2026 | 18h00 - 21h00",
+  description: "Rencontre conviviale entre professionnels du digital et de l'IA.",
+  type: "SIP & MEET",
+};
+
+function isTrackParam(v: string | null): v is AgendaTrackKey {
+  return v === "general" || v === "specialist" || v === "manager" || v === "director" || v === "executive";
+}
 
 export default function AgendaPage() {
   const [activeTrack, setActiveTrack] = useState<AgendaTrackKey>("general");
   const [eventModal, setEventModal] = useState<AgendaEvent | null>(null);
+  const [agendaModal, setAgendaModal] = useState<{
+    track: AgendaTrackKey;
+    row: (typeof ULTRA_BOOTCAMP_AGENDA_MONTHS)[number];
+    format: string;
+    theme: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const t = new URLSearchParams(window.location.search).get("track");
+    if (isTrackParam(t)) setActiveTrack(t);
+  }, []);
 
   useEffect(() => {
     if (!eventModal) return;
@@ -127,6 +90,16 @@ export default function AgendaPage() {
       />
 
       <SiteHeader />
+
+      <EventAgendaAccessModal
+        open={agendaModal != null}
+        onClose={() => setAgendaModal(null)}
+        defaultTrack={agendaModal?.track ?? "specialist"}
+        monthLabel={agendaModal?.row.month ?? ""}
+        monthIndex={agendaModal?.row.monthIndex ?? 0}
+        eventFormat={agendaModal?.format ?? ""}
+        themeLine={agendaModal?.theme ?? ""}
+      />
 
       <AnimatePresence>
         {eventModal && (
@@ -153,7 +126,7 @@ export default function AgendaPage() {
             >
               <div className="mb-4 flex items-center justify-between gap-3">
                 <h2 className="text-xl font-semibold text-[#D4AF37]" style={{ fontFamily: '"Playfair Display", serif' }}>
-                  Inscription événement
+                  Réservation
                 </h2>
                 <button
                   type="button"
@@ -176,21 +149,28 @@ export default function AgendaPage() {
 
       <main className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-16 pt-10 sm:px-8">
         <motion.section initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1
-            className="text-5xl font-semibold leading-[1.05] text-[#D4AF37] md:text-7xl"
-            style={{ fontFamily: '"Playfair Display", serif' }}
-          >
-            Agenda
-          </h1>
-          <p className="mt-6 max-w-3xl text-base leading-relaxed text-[#C8C8CF] sm:text-lg">
-            Événements, rencontres et masterclass UltraBoost — sélectionnez votre filière pour afficher le calendrier dédié.
-          </p>
+          <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1
+                className="text-5xl font-semibold leading-[1.05] text-[#D4AF37] md:text-7xl"
+                style={{ fontFamily: '"Playfair Display", serif' }}
+              >
+                Agenda
+              </h1>
+              <p className="mt-6 max-w-3xl text-base leading-relaxed text-[#C8C8CF] sm:text-lg">
+                Calendriers par niveau de bootcamp. Choisissez votre calendrier, consultez les créneaux indicatifs et
+                inscrivez-vous. Les événements peuvent être payants ou gratuits — nous vous recontactons sous 48h pour le
+                détail du programme dédié.
+              </p>
+            </div>
+            <SiteBrandedLogo imgClassName="size-16 shrink-0 object-contain opacity-95 sm:size-20" gradientIdSuffix="agenda" />
+          </div>
           <div className="divider-gold mt-8 max-w-2xl" />
         </motion.section>
 
         <div className="sticky top-16 z-[100] -mx-6 mb-10 border-b border-[rgba(201,168,76,0.18)] bg-[#0A0A0F]/92 px-4 py-4 backdrop-blur-md sm:-mx-8 sm:px-6 sm:top-[4.5rem]">
           <p className="mb-3 text-center text-[10px] font-semibold uppercase tracking-[0.28em] text-[#C9A84C]/90">
-            Filières
+            Calendrier
           </p>
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
             {TRACK_ORDER.map((key) => {
@@ -226,47 +206,87 @@ export default function AgendaPage() {
                 <div className="pointer-events-none absolute bottom-0 left-0 top-0 w-px bg-gradient-to-b from-transparent via-[rgba(201,168,76,0.65)] to-transparent sm:left-3" />
                 <div className="mb-8 rounded-2xl border border-[rgba(201,168,76,0.14)] bg-gradient-to-br from-[rgba(212,175,55,0.06)] to-transparent p-6 sm:p-8">
                   <h2 className="text-xl font-semibold text-[#D4AF37] sm:text-2xl" style={{ fontFamily: '"Playfair Display", serif' }}>
-                    Les Jeudis UltraBoost
+                    Agenda Général
                   </h2>
                   <p className="mt-2 text-sm leading-relaxed text-[#C8C8CF]">
-                    Événements ouverts à la communauté — networking, apéros SIP &amp; MEET, masterclass et rencontres
-                    d&apos;intelligence.
+                    Mise en avant : apéro SIP &amp; MEET — réservation ouverte.
                   </p>
                 </div>
                 <div className="space-y-8">
-                  {events.map((event, index) => (
-                    <motion.article
-                      key={`${event.month}-${event.title}`}
-                      initial={{ opacity: 0, y: 28 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.15 }}
-                      transition={{ duration: 0.65, delay: index * 0.02 }}
-                      className="relative rounded-2xl border border-[rgba(201,168,76,0.12)] bg-white/[0.02] p-6 pl-8 sm:pl-10"
+                  <motion.article
+                    initial={{ opacity: 0, y: 28 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.15 }}
+                    transition={{ duration: 0.65 }}
+                    className="relative rounded-2xl border border-[rgba(201,168,76,0.12)] bg-white/[0.02] p-6 pl-8 sm:pl-10"
+                  >
+                    <div className="absolute left-0 top-8 h-3 w-3 -translate-x-1/2 rounded-full bg-[#D4AF37] shadow-[0_0_0_6px_rgba(212,175,55,0.14)] sm:left-3" />
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="rounded-full border border-[rgba(201,168,76,0.35)] bg-[rgba(201,168,76,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[#D4AF37]">
+                        SIP &amp; MEET — Avril
+                      </span>
+                    </div>
+                    <h3
+                      className="mt-4 text-2xl font-semibold text-[#D4AF37]"
+                      style={{ fontFamily: '"Playfair Display", serif' }}
                     >
-                      <div className="absolute left-0 top-8 h-3 w-3 -translate-x-1/2 rounded-full bg-[#D4AF37] shadow-[0_0_0_6px_rgba(212,175,55,0.14)] sm:left-3" />
-                      <div className="flex flex-wrap items-center gap-3">
-                        <span className="rounded-full border border-[rgba(201,168,76,0.35)] bg-[rgba(201,168,76,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[#D4AF37]">
-                          {event.type}
-                        </span>
-                        <span className="text-sm uppercase tracking-[0.1em] text-[#C8C8CF]">{event.month}</span>
-                      </div>
-                      <h3
-                        className="mt-4 text-2xl font-semibold text-[#D4AF37]"
-                        style={{ fontFamily: '"Playfair Display", serif' }}
+                      {SIP_MEET_AVRIL.title}
+                    </h3>
+                    <p className="mt-3 text-lg font-medium text-[#F5F5F7]">{SIP_MEET_AVRIL.datetime}</p>
+                    <p className="mt-3 text-sm leading-relaxed text-[#C8C8CF]">&quot;{SIP_MEET_AVRIL.description}&quot;</p>
+                    <button
+                      type="button"
+                      onClick={() => setEventModal(SIP_MEET_AVRIL)}
+                      className="btn-gold mt-6 px-6 py-3 text-sm"
+                    >
+                      Réservations
+                    </button>
+                  </motion.article>
+
+                  {GENERAL_MONTHS_MAI_NOV.map((row, idx) => {
+                    const pub = AGENDA_PUBLIC_STRUCTURE.general;
+                    const format = agendaEventFormat(row.monthIndex, "general");
+                    const theme = agendaThemeLine(row.monthIndex, "general");
+                    return (
+                      <motion.article
+                        key={`general-extra-${row.month}`}
+                        initial={{ opacity: 0, y: 28 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.15 }}
+                        transition={{ duration: 0.65, delay: (idx + 1) * 0.04 }}
+                        className="relative rounded-2xl border border-[rgba(201,168,76,0.12)] bg-white/[0.02] p-6 pl-8 sm:pl-10"
                       >
-                        {event.title}
-                      </h3>
-                      <p className="mt-3 text-lg font-medium text-[#F5F5F7]">{event.datetime}</p>
-                      <p className="mt-3 text-sm leading-relaxed text-[#C8C8CF]">&quot;{event.description}&quot;</p>
-                      <button
-                        type="button"
-                        onClick={() => setEventModal(event)}
-                        className="btn-gold mt-6 px-6 py-3 text-sm"
-                      >
-                        S&apos;inscrire
-                      </button>
-                    </motion.article>
-                  ))}
+                        <div className="absolute left-0 top-8 h-3 w-3 -translate-x-1/2 rounded-full bg-[#D4AF37] shadow-[0_0_0_6px_rgba(212,175,55,0.14)] sm:left-3" />
+                        <div className="flex flex-wrap items-center gap-3">
+                          <span className="rounded-full border border-[rgba(201,168,76,0.35)] bg-[rgba(201,168,76,0.12)] px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[#D4AF37]">
+                            {row.month}
+                          </span>
+                        </div>
+                        <p className="mt-4 text-sm font-medium text-[#F5F5F7]">
+                          {pub.dayLabel} · {pub.periodLabel}
+                        </p>
+                        <p className="mt-2 text-lg font-semibold text-[#D4AF37]" style={{ fontFamily: '"Playfair Display", serif' }}>
+                          18h00 – 21h00
+                        </p>
+                        <p className="mt-3 text-base font-semibold text-[#F5F5F7]">{format}</p>
+                        <p className="mt-3 text-sm leading-relaxed text-[#C8C8CF]">{theme}</p>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setAgendaModal({
+                              track: "general",
+                              row,
+                              format,
+                              theme,
+                            })
+                          }
+                          className="btn-gold mt-6 w-full px-6 py-3 text-sm sm:w-auto"
+                        >
+                          Activer mon accès
+                        </button>
+                      </motion.article>
+                    );
+                  })}
                 </div>
               </section>
             ) : (
@@ -302,7 +322,7 @@ export default function AgendaPage() {
                               whileInView={{ opacity: 1, y: 0 }}
                               viewport={{ once: true, amount: 0.12 }}
                               transition={{ duration: 0.5, delay: index * 0.02 }}
-                              className="glass-card-gold border border-[rgba(201,168,76,0.14)] p-6"
+                              className="glass-card-gold flex flex-col border border-[rgba(201,168,76,0.14)] p-6"
                             >
                               <div className="flex items-center justify-between gap-2 border-b border-white/[0.06] pb-3">
                                 <span className="text-lg font-semibold text-[#D4AF37]" style={{ fontFamily: '"Playfair Display", serif' }}>
@@ -313,7 +333,21 @@ export default function AgendaPage() {
                                 </span>
                               </div>
                               <p className="mt-4 text-sm font-semibold text-[#F5F5F7]">{format}</p>
-                              <p className="mt-3 text-sm leading-relaxed text-[#C8C8CF]">{theme}</p>
+                              <p className="mt-3 flex-1 text-sm leading-relaxed text-[#C8C8CF]">{theme}</p>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setAgendaModal({
+                                    track: activeTrack,
+                                    row,
+                                    format,
+                                    theme,
+                                  })
+                                }
+                                className="btn-gold mt-6 w-full py-3 text-sm"
+                              >
+                                Activer mon accès
+                              </button>
                             </motion.article>
                           );
                         })}
@@ -325,6 +359,13 @@ export default function AgendaPage() {
             )}
           </motion.div>
         </AnimatePresence>
+
+        <p className="mt-12 text-center text-xs text-[#9999A9]">
+          Besoin d&apos;un autre créneau ?{" "}
+          <Link href="/contact" className="text-[#D4AF37] underline decoration-[rgba(212,175,55,0.35)] underline-offset-4 hover:text-[#E8D5A3]">
+            Contact
+          </Link>
+        </p>
       </main>
 
       <SiteFooter />
