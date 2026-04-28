@@ -65,13 +65,8 @@ export function SiteFooter() {
                 </a>
               </p>
               <p className="pt-1">
-                <a href="mailto:hubs@ultraboost.pro" className="text-[#D4AF37] underline decoration-[rgba(212,175,55,0.35)] underline-offset-4 hover:text-[#E8D5A3]">
-                  hubs@ultraboost.pro
-                </a>
-              </p>
-              <p>
-                <a href="mailto:admission@ultraboost.pro" className="text-[#D4AF37] underline decoration-[rgba(212,175,55,0.35)] underline-offset-4 hover:text-[#E8D5A3]">
-                  admission@ultraboost.pro
+                <a href="mailto:infos@ultraboost.pro" className="text-[#D4AF37] underline decoration-[rgba(212,175,55,0.35)] underline-offset-4 hover:text-[#E8D5A3]">
+                  infos@ultraboost.pro
                 </a>
               </p>
             </div>

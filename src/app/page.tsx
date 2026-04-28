@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Globe, GraduationCap, Plane } from "lucide-react";
@@ -86,7 +87,10 @@ export default function Home() {
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
         <div className="w-full rounded-[2rem] border border-[rgba(201,168,76,0.10)] bg-white/[0.03] p-8 backdrop-blur-xl sm:p-12">
-          <div className="mx-auto max-w-3xl">
+          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+
+            {/* Colonne texte */}
+            <div>
               <p className="text-sm uppercase tracking-[0.35em] text-[#D4AF37]/90">L&apos;expérience rencontre l&apos;innovation digitale</p>
               <h1
                 className="mt-6 text-4xl font-semibold leading-[1.1] text-[#F5F5F7] sm:text-5xl md:text-6xl lg:text-7xl"
@@ -94,16 +98,12 @@ export default function Home() {
               >
                 UltraBoost
               </h1>
-              <p className="mt-7 max-w-3xl text-base leading-relaxed text-[#C8C8CF] sm:text-lg">
+              <p className="mt-7 text-base leading-relaxed text-[#C8C8CF] sm:text-lg">
                 UltraBoost est une plateforme internationale dédiée aux professionnels souhaitant se réinventer, maîtriser
                 les outils du digital, de l&apos;intelligence artificielle, de l&apos;e-business et de la disruption, tout en
                 valorisant et monétisant leur savoir.
               </p>
-              <p className="mt-5 max-w-3xl text-sm leading-relaxed text-[#9999A9] sm:text-base">
-                UltraBoost permet de développer des projets e-business, d&apos;acquérir des compétences du digital et IA,
-                d&apos;accéder à de nouvelles opportunités économiques au niveau national et international.
-              </p>
-              <p className="mt-5 max-w-3xl text-sm leading-relaxed text-[#9999A9] sm:text-base">
+              <p className="mt-5 text-sm leading-relaxed text-[#9999A9] sm:text-base">
                 Notre approche unique : 80% de pratique pour un impact immédiat, combinée à une stratégie IA qui vous permet
                 de monétiser votre expertise avec précision.
               </p>
@@ -117,7 +117,7 @@ export default function Home() {
                   </span>
                 ))}
               </div>
-              <div className="mt-8 grid max-w-3xl grid-cols-3 gap-4 border-t border-[rgba(201,168,76,0.15)] pt-8">
+              <div className="mt-8 grid grid-cols-3 gap-4 border-t border-[rgba(201,168,76,0.15)] pt-8">
                 <div>
                   <p className="text-2xl font-semibold text-[#D4AF37] sm:text-3xl" style={{ fontFamily: '"Playfair Display", serif' }}>
                     80%
@@ -137,7 +137,7 @@ export default function Home() {
                   <p className="mt-1 text-xs uppercase tracking-wider text-[#C8C8CF] sm:text-sm">Pro</p>
                 </div>
               </div>
-              <div className="divider-gold mt-8 max-w-xl" />
+              <div className="divider-gold mt-8" />
               <button
                 type="button"
                 onClick={() => setModalOpen(true)}
@@ -145,6 +145,38 @@ export default function Home() {
               >
                 REJOINDRE L&apos;ÉLITE
               </button>
+            </div>
+
+            {/* Colonne image */}
+            <div className="relative hidden lg:flex lg:items-center lg:justify-center">
+              {/* Halo doré derrière l'image */}
+              <div
+                className="pointer-events-none absolute inset-0 rounded-3xl blur-2xl"
+                style={{ background: "radial-gradient(ellipse at 60% 50%, rgba(212,175,55,0.18) 0%, transparent 70%)" }}
+              />
+              {/* Cadre de l'image */}
+              <div className="relative w-full overflow-hidden rounded-3xl border border-[rgba(201,168,76,0.25)] shadow-[0_0_60px_rgba(212,175,55,0.10)]">
+                <Image
+                  src="/ultraboost-Imageacceuil.png"
+                  alt="UltraBoost — Excellence digitale"
+                  width={680}
+                  height={780}
+                  priority
+                  className="h-auto w-full object-cover"
+                  style={{ maxHeight: "70vh" }}
+                />
+                {/* Dégradé bas pour fondre avec le fond */}
+                <div
+                  className="pointer-events-none absolute bottom-0 left-0 right-0 h-24"
+                  style={{ background: "linear-gradient(to top, rgba(10,10,15,0.7) 0%, transparent 100%)" }}
+                />
+                {/* Badge signature coin bas-gauche */}
+                <div className="absolute bottom-5 left-5 rounded-xl border border-[rgba(201,168,76,0.30)] bg-black/60 px-4 py-2 backdrop-blur-md">
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-[#D4AF37]/80">Excellence · Discrétion</p>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </motion.section>
@@ -215,12 +247,37 @@ export default function Home() {
         {...revealOnScroll}
         className="relative z-10 mx-auto w-full max-w-6xl scroll-mt-28 px-6 py-10 sm:scroll-mt-32 sm:px-8"
       >
-        <h2
-          className="text-2xl font-semibold text-[#F5F5F7] sm:text-3xl"
-          style={{ fontFamily: '"Playfair Display", serif' }}
-        >
-          UltraBootcamps
-        </h2>
+        {/* Banner image UltraBootcamps */}
+        <div className="relative mb-8 overflow-hidden rounded-2xl border border-[rgba(201,168,76,0.20)] shadow-[0_0_50px_rgba(212,175,55,0.08)]">
+          <Image
+            src="/ultraboost-ia1.png"
+            alt="UltraBootcamps — Bootcamps immersifs UltraBoost"
+            width={1200}
+            height={420}
+            className="h-[220px] w-full object-cover sm:h-[300px] lg:h-[360px]"
+          />
+          {/* Overlay gradient pour lisibilité du texte */}
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(to right, rgba(10,10,15,0.82) 0%, rgba(10,10,15,0.40) 55%, rgba(10,10,15,0.10) 100%)" }}
+          />
+          {/* Contenu texte sur l'image */}
+          <div className="absolute inset-0 flex flex-col justify-center px-8 sm:px-12">
+            <p className="text-xs uppercase tracking-[0.3em] text-[#D4AF37]/80">Formation · Expertise · Excellence</p>
+            <h2
+              className="mt-3 text-3xl font-semibold text-[#F5F5F7] sm:text-4xl lg:text-5xl"
+              style={{ fontFamily: '"Playfair Display", serif' }}
+            >
+              UltraBootcamps
+            </h2>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-[#C8C8CF] sm:text-base">
+              Bootcamps Online, Premium et VIP — 80% de pratique pour un impact immédiat.
+            </p>
+          </div>
+          {/* Bord doré décoratif gauche */}
+          <div className="absolute bottom-0 left-0 top-0 w-1 rounded-l-2xl" style={{ background: "linear-gradient(to bottom, transparent, #D4AF37, transparent)" }} />
+        </div>
+
         <div className="glass-card mt-6 rounded-2xl border border-[rgba(201,168,76,0.12)] p-0">
           <UltraBootcampsStickyNav mode="filter" activeId={activeTab} onSelect={setActiveTab} />
 
@@ -295,53 +352,128 @@ export default function Home() {
         </div>
       </motion.section>
 
-      <HomeAnchorSection id="hub" title="UltraBoost Hub" href="/hub">
-        Espace premium dédié à la recherche, au business et à l&apos;innovation : accédez aux ressources, modules et
-        parcours pour accélérer vos projets.
-      </HomeAnchorSection>
+      {/* Section écosystème — Hub, TravelBootcamps, Agenda, Partenaires, Contact regroupés avec l'image */}
+      <section className="relative z-10 mx-auto w-full max-w-6xl scroll-mt-28 px-6 py-10 sm:scroll-mt-32 sm:px-8">
+        <div className="glass-card-gold overflow-hidden rounded-2xl border border-[rgba(201,168,76,0.12)]">
+          <div className="grid lg:grid-cols-[1fr_1.1fr]">
 
-      <HomeAnchorSection id="travelbootcamps" title="TravelBootcamps" href="/travelbootcamps">
-        Vivez un bootcamp immersif dans une capitale stratégique chaque année : networking, expertises locales et
-        expérience UltraBoost hors des sentiers battus.
-      </HomeAnchorSection>
+            {/* Image gauche — occupe toute la hauteur */}
+            <div className="relative hidden lg:block">
+              <Image
+                src="/ultraboost-imagesbusiness.png"
+                alt="UltraBoost — Écosystème Business & Innovation"
+                width={600}
+                height={700}
+                className="h-full w-full object-cover"
+              />
+              {/* Fondu droite */}
+              <div
+                className="absolute inset-0"
+                style={{ background: "linear-gradient(to right, rgba(10,10,15,0) 40%, rgba(10,10,15,0.85) 100%)" }}
+              />
+              {/* Vignette haut/bas */}
+              <div
+                className="absolute inset-0"
+                style={{ background: "linear-gradient(to bottom, rgba(10,10,15,0.35) 0%, transparent 20%, transparent 80%, rgba(10,10,15,0.35) 100%)" }}
+              />
+              {/* Label sur l'image */}
+              <div className="absolute bottom-6 left-6">
+                <p className="text-[10px] uppercase tracking-[0.25em] text-[#D4AF37]/70">Écosystème UltraBoost</p>
+              </div>
+            </div>
 
-      <HomeAnchorSection id="agenda" title="Agenda" href="/agenda">
-        Dates de sessions, événements exclusifs et temps forts du calendrier UltraBoost — planifiez votre prochaine
-        montée en puissance.
-      </HomeAnchorSection>
+            {/* Sections à droite */}
+            <div className="divide-y divide-[rgba(201,168,76,0.10)]">
+              {[
+                { id: "hub", title: "UltraBoost Hub", href: "/hub", desc: "Espace premium dédié à la recherche, au business et à l'innovation : accédez aux ressources, modules et parcours pour accélérer vos projets." },
+                { id: "travelbootcamps", title: "TravelBootcamps", href: "/travelbootcamps", desc: "Vivez un bootcamp immersif dans une capitale stratégique chaque année : networking, expertises locales et expérience UltraBoost hors des sentiers battus." },
+                { id: "agenda", title: "Agenda", href: "/agenda", desc: "Dates de sessions, événements exclusifs et temps forts du calendrier UltraBoost — planifiez votre prochaine montée en puissance." },
+                { id: "partenaires", title: "Partenaires", href: "/networking", desc: "Écosystème d'institutions, entreprises et leaders alignés avec la vision UltraBoost : synergies, visibilité et opportunités pour les membres." },
+                { id: "contact", title: "Contact", href: "/contact", desc: "Une question sur l'admission, un programme ou un partenariat ? Notre équipe répond aux professionnels éligibles avec la discrétion attendue." },
+              ].map((item) => (
+                <div
+                  key={item.id}
+                  id={item.id}
+                  className="group flex items-start justify-between gap-4 px-6 py-5 transition-colors hover:bg-[rgba(201,168,76,0.04)] sm:px-8 sm:py-6"
+                >
+                  <div className="flex-1">
+                    <h2
+                      className="text-lg font-semibold text-[#D4AF37] sm:text-xl"
+                      style={{ fontFamily: "Playfair Display, serif" }}
+                    >
+                      {item.title}
+                    </h2>
+                    <p className="mt-1.5 text-sm leading-relaxed text-[#C8C8CF]">{item.desc}</p>
+                  </div>
+                  <Link
+                    href={item.href}
+                    className="btn-outline-gold mt-1 shrink-0 px-5 py-2.5 text-xs"
+                  >
+                    Découvrir
+                  </Link>
+                </div>
+              ))}
+            </div>
 
-      <HomeAnchorSection id="partenaires" title="Partenaires" href="/networking">
-        Écosystème d&apos;institutions, entreprises et leaders alignés avec la vision UltraBoost : synergies, visibilité
-        et opportunités pour les membres.
-      </HomeAnchorSection>
-
-      <HomeAnchorSection id="contact" title="Contact" href="/contact">
-        Une question sur l&apos;admission, un programme ou un partenariat ? Notre équipe répond aux professionnels éligibles
-        avec la discrétion attendue.
-      </HomeAnchorSection>
+          </div>
+        </div>
+      </section>
 
       <motion.section
         id="candidature-elite"
         {...revealOnScroll}
         className="relative z-10 mx-auto w-full max-w-6xl scroll-mt-28 px-6 pb-10 pt-2 sm:scroll-mt-32 sm:px-8"
       >
-        <div className="glass-card-gold border border-[rgba(201,168,76,0.14)] p-8 text-center sm:p-10">
-          <p
-            className="text-2xl font-semibold text-[#F5F5F7] sm:text-3xl"
-            style={{ fontFamily: '"Playfair Display", serif' }}
-          >
-            Rejoignez l&apos;élite UltraBoost
-          </p>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-[#C8C8CF]">
-            Candidature réservée aux professionnels éligibles. Un conseiller vous recontacte sous 48h.
-          </p>
-          <button
-            type="button"
-            onClick={() => setModalOpen(true)}
-            className="btn-gold mt-8 px-10 py-4 text-sm uppercase tracking-[0.18em]"
-          >
-            REJOINDRE L&apos;ÉLITE
-          </button>
+        <div className="glass-card-gold overflow-hidden rounded-2xl border border-[rgba(201,168,76,0.14)]">
+          <div className="grid lg:grid-cols-2">
+
+            {/* Image gauche */}
+            <div className="relative hidden lg:block">
+              <Image
+                src="/UltraBoost-imageuntrabootcamps.png"
+                alt="Rejoignez l'élite UltraBoost"
+                width={600}
+                height={420}
+                className="h-full w-full object-cover"
+              />
+              {/* Overlay dégradé vers la droite pour fondre avec la card */}
+              <div
+                className="absolute inset-0"
+                style={{ background: "linear-gradient(to right, rgba(10,10,15,0) 40%, rgba(10,10,15,0.85) 100%)" }}
+              />
+              {/* Overlay haut/bas */}
+              <div
+                className="absolute inset-0"
+                style={{ background: "linear-gradient(to bottom, rgba(10,10,15,0.3) 0%, rgba(10,10,15,0) 40%, rgba(10,10,15,0.3) 100%)" }}
+              />
+            </div>
+
+            {/* Contenu droit */}
+            <div className="flex flex-col items-center justify-center p-8 text-center sm:p-12 lg:items-start lg:text-left">
+              <p className="text-xs uppercase tracking-[0.3em] text-[#D4AF37]/80">Candidature exclusive</p>
+              <p
+                className="mt-4 text-2xl font-semibold text-[#F5F5F7] sm:text-3xl"
+                style={{ fontFamily: '"Playfair Display", serif' }}
+              >
+                Rejoignez l&apos;élite UltraBoost
+              </p>
+              <p className="mt-4 max-w-sm text-sm leading-relaxed text-[#C8C8CF]">
+                Candidature réservée aux professionnels éligibles. Un conseiller vous recontacte sous 48h.
+              </p>
+              <div className="mt-2 flex items-center gap-2">
+                <span className="h-px w-8 bg-[#D4AF37]/40" />
+                <span className="text-xs text-[#9696A3]">Sélection rigoureuse · Standards irréprochables</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setModalOpen(true)}
+                className="btn-gold mt-8 px-10 py-4 text-sm uppercase tracking-[0.18em]"
+              >
+                REJOINDRE L&apos;ÉLITE
+              </button>
+            </div>
+
+          </div>
         </div>
       </motion.section>
 
