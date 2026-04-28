@@ -957,7 +957,7 @@ export default function ContactPage() {
                       </label>
                       <label className="block">
                         <span className={labelCls}>Horaire souhaité</span>
-                        <span className={hintCls}>Créneau de formation qui vous convient le mieux.</span>
+                        <span className={hintCls}>Créneau de bootcamp qui vous convient le mieux.</span>
                         <select name="horaire" className={selectCls}>
                           <option value="">Choisir</option>
                           <option value="morning">Morning : 09h — 12h</option>

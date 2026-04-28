@@ -546,7 +546,7 @@ export function AdmissionFormWizard({
                 <>
                   <label className="block">
                     <span className={labelCls}>Domaine</span>
-                    <span className={hintCls}>Sélectionnez le domaine de formation (Écosystèmes, Applications, Expertise…).</span>
+                    <span className={hintCls}>Sélectionnez le domaine de bootcamp (Écosystèmes, Applications, Expertise…).</span>
                     <select
                       value={selectedDomaine}
                       onChange={(e) => {

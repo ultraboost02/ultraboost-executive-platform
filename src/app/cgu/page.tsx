@@ -7,7 +7,7 @@ const sections: { title: string; paragraphs: string[] }[] = [
   {
     title: "1. Présentation et objet",
     paragraphs: [
-      "UltraBoost est une initiative stratégique et un programme d'excellence développé par l'IPMD (Institut Polytechnique des Métiers du Digital). Les présentes Conditions Générales d'Utilisation ont pour objet de définir les modalités d'accès, d'inscription et d'utilisation des services proposés dans le cadre des programmes UltraBoost, incluant notamment les formations exécutives, les bootcamps, les événements et les dispositifs d'accompagnement professionnel.",
+      "UltraBoost est une initiative stratégique et un programme d'excellence développé par l'IPMD (Institut Polytechnique des Métiers du Digital). Les présentes Conditions Générales d'Utilisation ont pour objet de définir les modalités d'accès, d'inscription et d'utilisation des services proposés dans le cadre des programmes UltraBoost, incluant notamment les bootcamps exécutifs, les événements et les dispositifs d'accompagnement professionnel.",
     ],
   },
   {
@@ -19,7 +19,7 @@ const sections: { title: string; paragraphs: string[] }[] = [
   {
     title: "3. Nature des services",
     paragraphs: [
-      "UltraBoost propose des programmes à forte valeur ajoutée destinés aux professionnels, dirigeants, cadres supérieurs et décideurs. Ces services incluent notamment : des formations intensives (bootcamps exécutives) ; des sessions de mentorat stratégique ; des événements professionnels ; des dispositifs d'accompagnement à haute valeur.",
+      "UltraBoost propose des programmes à forte valeur ajoutée destinés aux professionnels, dirigeants, cadres supérieurs et décideurs. Ces services incluent notamment : des bootcamps intensifs ; des sessions de mentorat stratégique ; des événements professionnels ; des dispositifs d'accompagnement à haute valeur.",
       "L'IPMD se réserve le droit d'adapter, d'enrichir ou de faire évoluer les contenus et formats à tout moment, dans une logique d'excellence continue.",
     ],
   },

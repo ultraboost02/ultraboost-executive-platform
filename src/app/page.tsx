@@ -261,7 +261,7 @@ export default function Home() {
           />
           {/* Contenu texte sur l'image */}
           <div className="absolute inset-0 flex flex-col justify-center px-8 sm:px-12">
-            <p className="text-xs uppercase tracking-[0.3em] text-[#D4AF37]/80">Formation · Expertise · Impact</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-[#D4AF37]/80">Bootcamp · Expertise · Impact</p>
             <h2
               className="mt-3 text-3xl font-semibold text-[#F5F5F7] sm:text-4xl lg:text-5xl"
               style={{ fontFamily: '"Playfair Display", serif' }}
