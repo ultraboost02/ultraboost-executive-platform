@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "UltraBoost Executive",
   description:
-    "UltraBoost Executive — excellence, discrétion et standards irréprochables. Réservé aux professionnels éligibles.",
+    "UltraBoost Executive — précision, discrétion et standards irréprochables. Réservé aux professionnels éligibles.",
 };
 
 export default function RootLayout({

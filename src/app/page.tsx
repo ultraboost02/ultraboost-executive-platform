@@ -36,7 +36,7 @@ const whyStats = [
   { value: "6", label: "niveaux" },
   { value: "4", label: "Hubs" },
   { value: "9+", label: "événements/an" },
-  { value: "20+", label: "pays" },
+  { value: "12+", label: "pays" },
 ];
 
 const revealOnScroll = {
@@ -90,7 +90,7 @@ export default function Home() {
           <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
 
             {/* Colonne texte */}
-            <div>
+            <div className="lg:order-1">
               <p className="text-sm uppercase tracking-[0.35em] text-[#D4AF37]/90">L&apos;expérience rencontre l&apos;innovation digitale</p>
               <h1
                 className="mt-6 text-4xl font-semibold leading-[1.1] text-[#F5F5F7] sm:text-5xl md:text-6xl lg:text-7xl"
@@ -98,6 +98,9 @@ export default function Home() {
               >
                 UltraBoost
               </h1>
+              <p className="mt-4 text-base font-medium tracking-[0.08em] text-[#D4AF37]">
+                Précision.&nbsp; Réinvention.&nbsp; Stratégie.
+              </p>
               <p className="mt-7 text-base leading-relaxed text-[#C8C8CF] sm:text-lg">
                 UltraBoost est une plateforme internationale dédiée aux professionnels souhaitant se réinventer, maîtriser
                 les outils du digital, de l&apos;intelligence artificielle, de l&apos;e-business et de la disruption, tout en
@@ -143,12 +146,12 @@ export default function Home() {
                 onClick={() => setModalOpen(true)}
                 className="btn-gold mt-10 px-8 py-4 text-sm uppercase tracking-[0.18em] hover:shadow-[0_12px_30px_rgba(212,175,55,0.26)]"
               >
-                REJOINDRE L&apos;ÉLITE
+                REJOINDRE ULTRABOOST
               </button>
             </div>
 
             {/* Colonne image */}
-            <div className="relative hidden lg:flex lg:items-center lg:justify-center">
+            <div className="relative order-first flex items-center justify-center lg:order-2">
               {/* Halo doré derrière l'image */}
               <div
                 className="pointer-events-none absolute inset-0 rounded-3xl blur-2xl"
@@ -158,22 +161,17 @@ export default function Home() {
               <div className="relative w-full overflow-hidden rounded-3xl border border-[rgba(201,168,76,0.25)] shadow-[0_0_60px_rgba(212,175,55,0.10)]">
                 <Image
                   src="/ultraboost-Imageacceuil.png"
-                  alt="UltraBoost — Excellence digitale"
+                  alt="UltraBoost — Précision, Réinvention, Stratégie"
                   width={680}
                   height={780}
                   priority
-                  className="h-auto w-full object-cover"
-                  style={{ maxHeight: "70vh" }}
+                  className="h-[280px] w-full object-cover object-top sm:h-[340px] lg:h-auto lg:max-h-[70vh]"
                 />
                 {/* Dégradé bas pour fondre avec le fond */}
                 <div
                   className="pointer-events-none absolute bottom-0 left-0 right-0 h-24"
                   style={{ background: "linear-gradient(to top, rgba(10,10,15,0.7) 0%, transparent 100%)" }}
                 />
-                {/* Badge signature coin bas-gauche */}
-                <div className="absolute bottom-5 left-5 rounded-xl border border-[rgba(201,168,76,0.30)] bg-black/60 px-4 py-2 backdrop-blur-md">
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-[#D4AF37]/80">Excellence · Discrétion</p>
-                </div>
               </div>
             </div>
 
@@ -263,7 +261,7 @@ export default function Home() {
           />
           {/* Contenu texte sur l'image */}
           <div className="absolute inset-0 flex flex-col justify-center px-8 sm:px-12">
-            <p className="text-xs uppercase tracking-[0.3em] text-[#D4AF37]/80">Formation · Expertise · Excellence</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-[#D4AF37]/80">Formation · Expertise · Impact</p>
             <h2
               className="mt-3 text-3xl font-semibold text-[#F5F5F7] sm:text-4xl lg:text-5xl"
               style={{ fontFamily: '"Playfair Display", serif' }}
@@ -357,8 +355,8 @@ export default function Home() {
         <div className="glass-card-gold overflow-hidden rounded-2xl border border-[rgba(201,168,76,0.12)]">
           <div className="grid lg:grid-cols-[1fr_1.1fr]">
 
-            {/* Image gauche — occupe toute la hauteur */}
-            <div className="relative hidden lg:block">
+            {/* Image — visible mobile ET desktop */}
+            <div className="relative h-[200px] w-full lg:h-full">
               <Image
                 src="/ultraboost-imagesbusiness.png"
                 alt="UltraBoost — Écosystème Business & Innovation"
@@ -366,14 +364,18 @@ export default function Home() {
                 height={700}
                 className="h-full w-full object-cover"
               />
-              {/* Fondu droite */}
+              {/* Fondu bas sur mobile, droite sur desktop */}
               <div
                 className="absolute inset-0"
+                style={{ background: "linear-gradient(to bottom, rgba(10,10,15,0) 50%, rgba(10,10,15,0.75) 100%)" }}
+              />
+              <div
+                className="absolute inset-0 hidden lg:block"
                 style={{ background: "linear-gradient(to right, rgba(10,10,15,0) 40%, rgba(10,10,15,0.85) 100%)" }}
               />
-              {/* Vignette haut/bas */}
+              {/* Vignette haut/bas desktop */}
               <div
-                className="absolute inset-0"
+                className="absolute inset-0 hidden lg:block"
                 style={{ background: "linear-gradient(to bottom, rgba(10,10,15,0.35) 0%, transparent 20%, transparent 80%, rgba(10,10,15,0.35) 100%)" }}
               />
               {/* Label sur l'image */}
@@ -427,24 +429,23 @@ export default function Home() {
         <div className="glass-card-gold overflow-hidden rounded-2xl border border-[rgba(201,168,76,0.14)]">
           <div className="grid lg:grid-cols-2">
 
-            {/* Image gauche */}
-            <div className="relative hidden lg:block">
+            {/* Image gauche — visible mobile ET desktop */}
+            <div className="relative h-[200px] w-full lg:h-full">
               <Image
                 src="/UltraBoost-imageuntrabootcamps.png"
-                alt="Rejoignez l'élite UltraBoost"
+                alt="Rejoignez UltraBoost"
                 width={600}
                 height={420}
                 className="h-full w-full object-cover"
               />
-              {/* Overlay dégradé vers la droite pour fondre avec la card */}
+              {/* Overlay bas → droite sur desktop, bas sur mobile */}
               <div
                 className="absolute inset-0"
-                style={{ background: "linear-gradient(to right, rgba(10,10,15,0) 40%, rgba(10,10,15,0.85) 100%)" }}
+                style={{ background: "linear-gradient(to bottom, rgba(10,10,15,0) 50%, rgba(10,10,15,0.75) 100%)" }}
               />
-              {/* Overlay haut/bas */}
               <div
-                className="absolute inset-0"
-                style={{ background: "linear-gradient(to bottom, rgba(10,10,15,0.3) 0%, rgba(10,10,15,0) 40%, rgba(10,10,15,0.3) 100%)" }}
+                className="absolute inset-0 hidden lg:block"
+                style={{ background: "linear-gradient(to right, rgba(10,10,15,0) 40%, rgba(10,10,15,0.85) 100%)" }}
               />
             </div>
 
@@ -455,7 +456,7 @@ export default function Home() {
                 className="mt-4 text-2xl font-semibold text-[#F5F5F7] sm:text-3xl"
                 style={{ fontFamily: '"Playfair Display", serif' }}
               >
-                Rejoignez l&apos;élite UltraBoost
+                Rejoignez UltraBoost
               </p>
               <p className="mt-4 max-w-sm text-sm leading-relaxed text-[#C8C8CF]">
                 Candidature réservée aux professionnels éligibles. Un conseiller vous recontacte sous 48h.
@@ -469,7 +470,7 @@ export default function Home() {
                 onClick={() => setModalOpen(true)}
                 className="btn-gold mt-8 px-10 py-4 text-sm uppercase tracking-[0.18em]"
               >
-                REJOINDRE L&apos;ÉLITE
+                REJOINDRE ULTRABOOST
               </button>
             </div>
 

@@ -242,7 +242,7 @@ const serviceTiers = [
   { value: "platinum", label: "Platinum", desc: "Maximum 10 participants", icon: "★★" },
   { value: "vip", label: "VIP", desc: "Maximum 5 participants", icon: "★★★" },
   { value: "vvip", label: "VVIP", desc: "1 participant — Selon les horaires UltraBoost", icon: "★★★★" },
-  { value: "elite", label: "Elite", desc: "1 participant — Votre agenda est notre priorité", icon: "★★★★★" },
+  { value: "prestige", label: "Prestige", desc: "1 participant — Votre agenda est notre priorité", icon: "★★★★★" },
 ];
 
 const footerLinks = ["Home", "UltraBootcamps", "Hub", "TravelBootcamps", "Agenda", "À propos", "Contact"];

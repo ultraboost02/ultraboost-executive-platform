@@ -36,7 +36,7 @@ export default function ApplyPage() {
             className="mt-4 text-5xl font-semibold leading-[1.05] text-[#D4AF37] md:text-6xl"
             style={{ fontFamily: '"Playfair Display", serif' }}
           >
-            Rejoindre l&apos;élite
+            Rejoindre UltraBoost
           </h1>
           <p className="mt-6 max-w-3xl text-base leading-relaxed text-[#C8C8CF] sm:text-lg">
             Accès réservé aux professionnels exigeants. Sélectionnez votre programme, complétez votre profil et soumettez

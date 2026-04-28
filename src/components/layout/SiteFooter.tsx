@@ -29,7 +29,7 @@ export function SiteFooter() {
               </div>
             </Link>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-[#A8A8B3]">
-              Excellence, discrétion et standards professionnels — programmes exécutifs, bootcamps et réseau.
+              Précision. Réinvention. Stratégie. — programmes exécutifs, bootcamps et réseau.
             </p>
           </div>
 

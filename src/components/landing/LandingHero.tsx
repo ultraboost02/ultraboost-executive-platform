@@ -14,16 +14,16 @@ export function LandingHero() {
       <main className="relative z-10 mx-auto flex min-h-[calc(100vh-5rem)] max-w-6xl flex-col justify-center px-6 pb-24 pt-12 sm:px-8">
         <div className="max-w-3xl">
           <p className="font-display text-sm uppercase tracking-[0.35em] text-gold/90">
-            UltraBoost · Excellence réservée
+            UltraBoost · Précision. Réinvention. Stratégie.
           </p>
           <h1 className="font-display mt-6 text-4xl font-semibold leading-[1.1] text-white sm:text-5xl lg:text-6xl">
-            L&apos;élite
+            Le talent
             <br />
             <span className="bg-gradient-to-r from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent">
-              ne se présente pas.
+              ne s&apos;improvise pas.
             </span>
             <br />
-            Elle se choisit.
+            Il se construit.
           </h1>
           <p className="mt-8 max-w-xl text-lg leading-relaxed text-zinc-400">
             UltraBoost Executive est réservé aux leaders qui exigent performance, discrétion et
@@ -36,7 +36,7 @@ export function LandingHero() {
               onClick={() => setModalOpen(true)}
               className="group relative overflow-hidden rounded-xl border border-gold/50 bg-gold/10 px-8 py-4 text-sm font-semibold uppercase tracking-[0.2em] text-gold shadow-gold-glow transition hover:border-gold hover:bg-gold/20"
             >
-              <span className="relative z-10">Rejoindre l&apos;élite</span>
+              <span className="relative z-10">Rejoindre UltraBoost</span>
               <span
                 className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-gold/20 to-transparent transition group-hover:translate-x-full"
                 aria-hidden

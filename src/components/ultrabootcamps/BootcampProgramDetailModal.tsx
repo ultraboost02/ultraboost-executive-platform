@@ -111,7 +111,7 @@ export function BootcampProgramDetailModal({ program, onClose, zClass = "z-50" }
               <h4 className="text-sm font-semibold uppercase tracking-wider text-[#C9A84C]">🎯 Objectifs généraux du bootcamp</h4>
               <p className="mt-2 text-sm leading-relaxed text-[#C8C8CF]">
                 Renforcer vos compétences sur « {program.title} » avec une approche actionnable, des cas réels et un cadre
-                d&apos;excellence UltraBoost — du niveau {program.levelLabel} jusqu&apos;à la certification.
+                UltraBoost — du niveau {program.levelLabel} jusqu&apos;à la certification.
               </p>
             </section>
 

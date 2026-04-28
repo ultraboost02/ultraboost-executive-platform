@@ -50,7 +50,7 @@ export function RegistrationModal({ open, onClose }: RegistrationModalProps) {
                 ULTRABOOST · CANDIDATURE
               </p>
               <h2 id={titleId} className="mt-2 text-2xl font-semibold text-[#F5F5F7] sm:text-3xl" style={{ fontFamily: '"Playfair Display", serif' }}>
-                Rejoindre l&apos;élite
+                Rejoindre UltraBoost
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-[#9999A9]">
                 Accès réservé aux professionnels exigeants. Les candidats de moins de 36 ans sont soumis à validation
