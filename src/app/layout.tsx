@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { WhatsAppFloat } from "@/components/layout/WhatsAppFloat";
 
 export const metadata: Metadata = {
   title: "UltraBoost Executive",
   description:
     "UltraBoost Executive — précision, discrétion et standards irréprochables. Réservé aux professionnels éligibles.",
+  icons: {
+    icon: "/favicon.jpg",
+    shortcut: "/favicon.jpg",
+    apple: "/favicon.jpg",
+  },
 };
 
 export default function RootLayout({
@@ -39,6 +45,7 @@ export default function RootLayout({
           </div>
         </noscript>
         {children}
+        <WhatsAppFloat />
       </body>
     </html>
   );
